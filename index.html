@@ -1687,13 +1687,19 @@ if (allQuizDone()) secretUnlocked(false);
 }
 /* écran : diaporama (à remplir plus tard dans SLIDES, ex. 'slides/01.jpg') */
 const SLIDES = [];
-const screenMat = new THREE.MeshBasicMaterial({map: canvasTex(1280, 720, (g, w, h) => {
+function drawScreen(g, w, h, img){
   const gr = g.createRadialGradient(w/2, h/2, 40, w/2, h/2, w*.7); gr.addColorStop(0, '#1d2236'); gr.addColorStop(1, '#05060c'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
   g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.fillStyle = '#d4ae4f'; g.font = '600 120px Georgia, serif'; g.fillText('WikiMuseum', w/2, h/2 - 110);
-  g.fillStyle = '#efe6cf'; g.font = 'italic 54px Georgia, serif'; g.fillText('Diaporama à venir…', w/2, h/2 + 20);
-  g.fillStyle = '#9aa0b8'; g.font = '34px Georgia, serif'; g.fillText('Bravo : tu as validé les 12 salles du musée.', w/2, h/2 + 120);
-})});
+  g.fillStyle = '#d4ae4f'; g.font = '600 76px Georgia, serif'; g.fillText('WikiMuseum', w/2, 62);
+  if (img){ const ph = 520, pw = ph*img.width/img.height, x = (w - pw)/2, y = 112; g.fillStyle = '#d4ae4f'; g.fillRect(x - 6, y - 6, pw + 12, ph + 12); g.drawImage(img, x, y, pw, ph); }
+  else { g.fillStyle = '#efe6cf'; g.font = 'italic 54px Georgia, serif'; g.fillText('Diaporama à venir…', w/2, h/2); }
+  g.fillStyle = '#9aa0b8'; g.font = '30px Georgia, serif'; g.fillText('Bravo : tu as validé les 12 salles du musée.', w/2, 682);
+}
+const screenCanvas = document.createElement('canvas'); screenCanvas.width = 1280; screenCanvas.height = 720;
+drawScreen(screenCanvas.getContext('2d'), 1280, 720, null);
+const screenTexture = new THREE.CanvasTexture(screenCanvas); screenTexture.encoding = THREE.sRGBEncoding; screenTexture.anisotropy = 4;
+const screenMat = new THREE.MeshBasicMaterial({map: screenTexture});
+{ const im = new Image(); im.onload = () => { drawScreen(screenCanvas.getContext('2d'), 1280, 720, im); screenTexture.needsUpdate = true; }; im.src = 'img/cinema1.jpg'; }
 const screen = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 2.7), screenMat); screen.position.set(-8.81, 2.2, 31); screen.rotation.y = Math.PI/2; scene.add(screen);
 const slideTex = []; let slideI = 0, slideT = 0;
 SLIDES.forEach((src, i) => new THREE.TextureLoader().load(src, t => { t.encoding = THREE.sRGBEncoding; slideTex[i] = t; }));
