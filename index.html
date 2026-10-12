@@ -76,6 +76,10 @@ button:focus-visible{outline:2px solid var(--gilt);outline-offset:2px}
   <button id="quizChip" hidden>Quiz de la salle</button>
   <div class="cartel" id="cartel"><div class="t" id="cT">Bienvenue au musée</div><div class="a" id="cA">Visite guidée des 12 salles</div></div>
   <div class="prog" id="progWrap"><i id="prog"></i></div>
+  <div class="ctrls" id="concert" hidden>
+    <button id="bClap">Applaudir</button>
+    <button id="bRose">Lancer une rose</button>
+  </div>
   <div class="ctrls">
     <button id="bTour" aria-pressed="true">Visite guidée</button>
     <button id="bFree" aria-pressed="false">Me promener</button>
@@ -90,7 +94,7 @@ button:focus-visible{outline:2px solid var(--gilt);outline-offset:2px}
     <button id="bTag" class="txt" aria-pressed="false">Taguer</button>
     <button id="bAct" class="txt" hidden>Tirer</button>
   </div>
-  <div class="help" id="help" hidden>Glisse pour regarder · sur ordinateur, clique pour piloter la caméra à la souris (Échap pour libérer) · ZQSD ou flèches pour marcher · Espace pour sauter · T pour taguer · F pour l’action</div>
+  <div class="help" id="help" hidden>Glisse pour regarder · sur ordinateur, clique pour piloter la caméra à la souris (Échap pour libérer) · ZQSD ou flèches pour marcher · Espace pour sauter · T pour taguer · F pour l’action · au concert : C pour applaudir, R pour lancer une rose</div>
 </div>
 <div id="quiz" hidden>
   <div class="qp" role="dialog" aria-modal="true" aria-labelledby="qQ">
@@ -956,6 +960,10 @@ sitPose(nico, STAGE_Y - .39);
 const vNico = place(nico, 3.2, STAGE_Y - .39, 43.15, Math.PI, 'nico', {state: 'sing', timer: 120, path: null, pi: 0, phase: 0, cool: 0, kick: 0, home: [18.5, 41.25]});
 const mathias = human({name: 'Mathias', skin: skinA, hair: 0x3b2a1e, pants: lam(0x14307a), sleeve: lam(0xf7f7f7), torso: shirtMats(0xf7f7f7, olFront, backName('MATHIAS', '6', '#14307a'))});
 const vMathias = place(mathias, 25.5, 0, 41.25, -Math.PI/2, 'mathias', {phase: 0, cool: 0, kick: 0, home: [25.5, 41.25]});
+const bdxFront = (g, w, h) => { g.strokeStyle = '#ffffff'; g.lineWidth = 34; g.lineCap = 'butt'; g.beginPath(); g.moveTo(18, -10); g.lineTo(w/2, 150); g.lineTo(w - 18, -10); g.stroke(); g.fillStyle = '#ffffff'; g.beginPath(); g.arc(w*.27, 190, 13, 0, 7); g.fill(); };
+const bdxBack = (g, w, h) => { g.strokeStyle = '#ffffff'; g.lineWidth = 30; g.beginPath(); g.moveTo(18, -10); g.lineTo(w/2, 60); g.lineTo(w - 18, -10); g.stroke(); g.fillStyle = '#ffffff'; g.textAlign = 'center'; g.font = '800 34px Karla, Arial, sans-serif'; g.fillText('HUGO', w/2, 112); g.font = '900 100px Karla, Arial, sans-serif'; g.fillText('4', w/2, 215); };
+const hugo = human({name: 'Hugo', skin: skinD, hair: 0x6a4a2c, pants: lam(0xffffff), sleeve: lam(0x0b1d3a), torso: shirtMats(0x0b1d3a, bdxFront, bdxBack)});
+const vHugo = place(hugo, 18.5, 0, 41.25, Math.PI/2, 'hugo', {phase: 0, cool: 0, kick: 0, home: [18.5, 41.25]});
 
 /* notes de musique qui s'envolent de la scène */
 const noteTex = ['♪', '♫'].map(ch => canvasTex(64, 64, (g, w, h) => { g.fillStyle = '#e6c56a'; g.font = '700 52px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ch, w/2, h/2); }));
@@ -968,7 +976,7 @@ function updateNotes(dt){
 /* ---------- interface ---------- */
 const $ = id => document.getElementById(id);
 let shownRoom = null;
-function setRoom(r){ if (r === shownRoom) return; shownRoom = r; if (r === 'K') say('En concert', '« Morning Mornaight »' + (actx ? '' : ' · touche l’écran pour lancer le son'), 3500); const n = ROOMS[r] || ROOMS.p; $('roomNo').textContent = n[0]; $('roomName').textContent = n[1]; }
+function setRoom(r){ if (r === shownRoom) return; shownRoom = r; $('concert').hidden = r !== 'K'; if (r === 'K') say('En concert', '« Morning Mornaight »' + (actx ? '' : ' · touche l’écran pour lancer le son'), 3500); const n = ROOMS[r] || ROOMS.p; $('roomNo').textContent = n[0]; $('roomName').textContent = n[1]; }
 function setCartel(a){ const c = $('cartel'); if (!a){ c.setAttribute('data-off', ''); return; } c.removeAttribute('data-off'); $('cT').textContent = a.t; $('cA').textContent = a.r; }
 let sayTimer = null;
 function say(t, r, ms){ setCartel({t, r}); clearTimeout(sayTimer); sayTimer = setTimeout(() => setCartel(null), ms || 2400); }
@@ -1105,7 +1113,7 @@ function walkTo(v, tx, tz, sp, dt){
 function footAI(v, dt, others){
   v.cool -= dt; v.kick -= dt;
   const b = football, bs = Math.hypot(b.vx, b.vz);
-  const players = [vMathias].concat(vNico.state === 'play' ? [vNico] : []);
+  const players = [vMathias, vHugo];
   const chaser = players.filter(q => q.cool <= 0).sort((p, q) => Math.hypot(p.x - b.x, p.z - b.z) - Math.hypot(q.x - b.x, q.z - b.z))[0];
   const chase = chaser === v && inPitch(b.x, b.z) && bs < 1.5 && goalT <= 0;
   if (chase && Math.hypot(b.x - v.x, b.z - v.z) < .55){
@@ -1146,25 +1154,38 @@ function updateVisitors(dt){
     if (v.kind === 'piano'){ p.arms.forEach((a, i) => { a.rotation.x = -1.08 + Math.sin(v.t*9 + i*2)*.05; a.rotation.z = Math.sin(v.t*1.3 + i)*.12; }); p.head.rotation.x = Math.sin(v.t*3)*.08; if (noteT <= 0) spawnNote(v.x + .6, 2.0, v.z); }
     if (v.kind === 'cajon'){ p.arms.forEach((a, i) => { a.rotation.x = -.25 - Math.max(0, Math.sin(v.t*10.5 + i*Math.PI))*.35; a.rotation.z = (i ? -1 : 1)*.18; }); p.head.rotation.x = Math.max(0, Math.sin(v.t*5.2))*.12; }
     if (v.kind === 'nico'){
-      if (v.state === 'sing'){
-        v.timer -= dt; v.yaw = Math.PI;
+      const ct = concertTime(), tt = ct - 118, CAJ = [3.2, 43.15];
+      if (tt >= 0 && tt < 50 && tt < 47.5){
+        if (v.state === 'sing' || v.state === 'rise'){ v.state = 'rise'; if (walkTo(v, 6.1, 42.25, 1.4, dt)){ v.state = 'tango'; v.t0 = tt; } }
+        else if (v.state === 'tango'){
+          const tau = tt - v.t0, w = 2*Math.PI/9;
+          v.x = 7.0 + .9*Math.cos(w*tau + Math.PI); v.z = 42.25 + .22*Math.sin(2*w*tau);
+          const snap = Math.floor(tau/1.5) % 4, face = Math.PI + [0, .9, 0, -.9][snap];
+          v.yaw += angDiff(v.yaw, face)*Math.min(1, dt*14);
+          const beat = tau*2.2, s = Math.sin(beat*Math.PI);
+          p.legs[0].thigh.rotation.x = s*.45; p.legs[0].shin.rotation.x = Math.max(0, -s)*.5;
+          const gancho = (tau % 6) > 5.2;
+          p.legs[1].thigh.rotation.x = gancho ? .55 : -s*.45; p.legs[1].shin.rotation.x = gancho ? 1.5 : Math.max(0, s)*.5;
+          p.arms[1].rotation.x = -.25; p.arms[1].rotation.z = 1.35;
+          p.arms[0].rotation.x = -1.15; p.arms[0].rotation.z = .85;
+          p.head.rotation.y = [0, -.7, 0, .7][snap]; p.head.rotation.x = -.05;
+        } else { v.state = 'rise'; }
+      } else if (v.state !== 'sing'){
+        v.state = 'return'; p.head.rotation.y = 0; p.arms.forEach(a => a.rotation.z = 0);
+        if (walkTo(v, CAJ[0], CAJ[1], 1.6, dt)){ v.x = CAJ[0]; v.z = CAJ[1]; v.state = 'sing'; v.yaw = Math.PI; }
+      } else {
+        v.yaw = Math.PI;
         p.legs.forEach(l => { l.thigh.rotation.x = -Math.PI/2; l.shin.rotation.x = Math.PI/2; });
         p.arms.forEach((a, i) => { a.rotation.x = -.25 - Math.max(0, Math.sin(v.t*10.5 + i*Math.PI))*.35; a.rotation.z = (i ? -1 : 1)*.18; });
         p.head.rotation.x = -.08 + Math.sin(v.t*3)*.06;
         if (noteT <= 0) spawnNote(v.x, 2.35, v.z - .2);
-        if (v.timer <= 0){ v.state = 'go'; v.path = NICO_GO; v.pi = 0; }
-      } else if (v.state === 'go' || v.state === 'back'){
-        const [tx, tz] = v.path[v.pi];
-        if (walkTo(v, tx, tz, 1.5, dt)){ v.pi++; if (v.pi >= v.path.length){ if (v.state === 'go'){ v.state = 'play'; v.timer = 120; v.cool = 0; } else { v.state = 'sing'; v.timer = 120; v.yaw = Math.PI; } } }
-      } else if (v.state === 'play'){
-        v.timer -= dt; footAI(v, dt);
-        if (v.timer <= 0 && v.kick <= 0){ v.state = 'back'; v.path = NICO_BACK; v.pi = 0; }
       }
-      const ty = v.state === 'sing' ? STAGE_Y - .39 : onStage(v.x, v.z) ? STAGE_Y : 0; if (v.y === undefined) v.y = STAGE_Y - .39; v.y += (ty - v.y)*Math.min(1, dt*6);
+      const ty = v.state === 'sing' ? STAGE_Y - .39 : STAGE_Y; if (v.y === undefined) v.y = STAGE_Y - .39; v.y += (ty - v.y)*Math.min(1, dt*6);
       p.g.position.set(v.x, v.y, v.z); p.g.rotation.y = v.yaw;
     }
-    if (v.kind === 'mathias'){ footAI(v, dt); p.g.position.set(v.x, 0, v.z); p.g.rotation.y = v.yaw; }
-    if (v.kind !== 'nico' && v.kind !== 'mathias'){
+    if (bowT > 0 && (v.kind === 'piano' || v.kind === 'guitar' || (v.kind === 'nico' && v.state === 'sing'))) p.head.rotation.x = Math.max(p.head.rotation.x, .55*Math.sin(Math.PI*Math.min(1, (2.6 - bowT)/2.6)));
+    if (v.kind === 'mathias' || v.kind === 'hugo'){ footAI(v, dt); p.g.position.set(v.x, 0, v.z); p.g.rotation.y = v.yaw; }
+    if (v.kind !== 'nico' && v.kind !== 'mathias' && v.kind !== 'hugo'){
       const dx = pos.x - v.x, dz = pos.z - v.z, d = Math.hypot(dx, dz), body = p.g.rotation.y;
       let look = d < 4.5 ? angDiff(body, Math.atan2(dx, dz)) : 0; look = Math.max(-1, Math.min(1, look));
       p.head.rotation.y += (look - p.head.rotation.y) * Math.min(1, dt*3);
@@ -1205,12 +1226,14 @@ function schedule(){
     nextT += e8; step++;
   }
 }
-let songState = 'idle';
+let songState = 'idle', songStart = 0, SONG_LEN = 236.8;
+const pageT0 = performance.now();
+function concertTime(){ const t = songState === 'playing' && actx ? actx.currentTime - songStart : (performance.now() - pageT0)/1000; return ((t % SONG_LEN) + SONG_LEN) % SONG_LEN; }
 function loadSong(){
   songState = 'loading';
   fetch('audio/morning-mornaight.mp3').then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
     .then(b => new Promise((ok, ko) => actx.decodeAudioData(b, ok, ko)))
-    .then(buf => { const s = actx.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(master); s.start(); songState = 'playing'; })
+    .then(buf => { const s = actx.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(master); songStart = actx.currentTime + .05; s.start(songStart); SONG_LEN = buf.duration; songState = 'playing'; })
     .catch(() => { songState = 'failed'; });
 }
 function initAudio(){
@@ -1228,6 +1251,55 @@ function updateAudio(){
 }
 addEventListener('pointerdown', initAudio); addEventListener('keydown', initAudio);
 $('bSound').onclick = () => { soundOn = !soundOn; $('bSound').setAttribute('aria-pressed', soundOn); if (soundOn) initAudio(); };
+
+/* ---------- applaudir et lancer des roses ---------- */
+let bowT = 0;
+function clap(){
+  initAudio();
+  if (actx){
+    const t0 = actx.currentTime + .02;
+    for (let i = 0; i < 70; i++){
+      const t = t0 + Math.random()*2.8, s = actx.createBufferSource(); s.buffer = noiseBuf;
+      const bp = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1200 + Math.random()*1600; bp.Q.value = 1.2;
+      const g = actx.createGain(), a = .25 + Math.random()*.3; g.gain.setValueAtTime(a, t); g.gain.exponentialRampToValueAtTime(.001, t + .07);
+      s.connect(bp); bp.connect(g); g.connect(actx.destination); s.start(t); s.stop(t + .1);
+    }
+  }
+  bowT = 2.6; say('Bravo !', 'Les musiciens saluent le public.', 2200);
+}
+const roses = [];
+const roseMats = {stem: lam(0x2f7d32), head: new THREE.MeshPhongMaterial({color: 0xc8102e, shininess: 40}), leaf: lam(0x3f9e4a)};
+function makeRose(){
+  const g = new THREE.Group();
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(.006, .006, .34, 6), roseMats.stem); g.add(stem);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(.035, 10, 8), roseMats.head); head.scale.y = 1.25; head.position.y = .19; g.add(head);
+  const bud = new THREE.Mesh(new THREE.ConeGeometry(.036, .05, 8), roseMats.head); bud.position.y = .22; g.add(bud);
+  for (const sx of [-1, 1]){ const l = new THREE.Mesh(new THREE.BoxGeometry(.05, .012, .025), roseMats.leaf); l.position.set(sx*.025, .02, 0); l.rotation.z = sx*.5; g.add(l); }
+  return g;
+}
+function throwRose(){
+  const d = new THREE.Vector3(); cam.getWorldDirection(d);
+  const g = makeRose(); g.position.copy(cam.position).addScaledVector(d, .4); g.position.y -= .2; scene.add(g);
+  roses.push({g, vx: d.x*6.5, vy: d.y*6.5 + 2.6, vz: d.z*6.5, spin: 8 + Math.random()*6, landed: false});
+  if (roses.length > 50){ const o = roses.shift(); scene.remove(o.g); }
+}
+function updateRoses(dt){
+  for (const r of roses){
+    if (r.landed) continue;
+    r.vy -= 9.8*dt; r.g.position.x += r.vx*dt; r.g.position.y += r.vy*dt; r.g.position.z += r.vz*dt;
+    r.g.rotation.x += r.spin*dt; r.g.rotation.z += r.spin*.4*dt;
+    const p = r.g.position;
+    if (p.z > 44.65){ p.z = 44.65; r.vz = -Math.abs(r.vz)*.3; }
+    const gy = onStage(p.x, p.z) ? STAGE_Y + .02 : .02;
+    if (p.y <= gy && r.vy < 0){
+      p.y = gy; r.landed = true; r.g.rotation.set(Math.PI/2, 0, Math.random()*Math.PI*2);
+      if (gy > .1 && !r.told){ r.told = true; say('Une rose sur scène !', 'Les musiciens apprécient.', 1600); bowT = Math.max(bowT, 1.4); }
+    }
+  }
+}
+$('bClap').onclick = clap;
+$('bRose').onclick = throwRose;
+addEventListener('keydown', e => { if (quizOpen || e.repeat || $('concert').hidden) return; if (e.code === 'KeyC') clap(); if (e.code === 'KeyR') throwRose(); });
 
 /* ---------- quiz ---------- */
 let validated = {};
@@ -1470,6 +1542,7 @@ function tick(now){
   const dt = Math.min(.05, (now - last) / 1000); last = now;
   resize();
   if (!quizOpen){ if (mode === 'tour') tourStep(dt); else freeStep(dt); }
+  bowT = Math.max(0, bowT - dt); updateRoses(dt);
   updateGuards(dt); updateVisitors(dt); updateBalls(dt); updatePunch(dt); updateNotes(dt); updateKiosk(); updateAudio();
   if (mode === 'tour' && !drag){ look.idle += dt; if (look.idle > 1.6){ const k = Math.min(1, dt*2.5); look.yaw -= look.yaw*k; look.pitch -= look.pitch*k; } }
   const lt = mode === 'tour';
