@@ -1807,20 +1807,20 @@ function updateBirds(){
   dome(CX, CZ, RX + .15, RZ + .15, H - .005, 96, 0, .42);
 }
 
-/* ---------- musique d’ambiance (hors de portée du concert) ---------- */
-let ambGain = null, ambState = 'idle';
+/* ---------- musique d’ambiance (hors de portée du concert) : lecture en streaming ---------- */
+let ambEl = null, ambGain = null, ambVol = 0;
 function updateAmbient(){
   if (!actx) return;
-  if (!ambGain){
-    ambGain = actx.createGain(); ambGain.gain.value = 0; ambGain.connect(actx.destination); ambState = 'loading';
-    fetch('audio/ambiance.mp3').then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
-      .then(b => new Promise((ok, ko) => actx.decodeAudioData(b, ok, ko)))
-      .then(buf => { const s = actx.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(ambGain); s.start(); ambState = 'playing'; })
-      .catch(() => { ambState = 'none'; });
+  if (!ambEl){
+    ambEl = new Audio('audio/ambiance.mp3'); ambEl.loop = true; ambEl.preload = 'auto'; ambEl.crossOrigin = 'anonymous';
+    try { const src = actx.createMediaElementSource(ambEl); ambGain = actx.createGain(); ambGain.gain.value = 0; src.connect(ambGain); ambGain.connect(actx.destination); ambEl.volume = 1; }
+    catch(e){ ambGain = null; ambEl.volume = 0; }
   }
-  const d = Math.hypot(pos.x - 6.5, pos.z - 42.5), concert = Math.pow(Math.max(0, 1 - d/18), 1.6), room = roomAt(pos.x, pos.z);
+  const d = Math.hypot(pos.x - 6.5, pos.z - 42.5), room = roomAt(pos.x, pos.z);
   const v = soundOn && room !== 'S' ? .45*Math.max(0, Math.min(1, (d - 15)/4)) : 0;
-  ambGain.gain.setTargetAtTime(v, actx.currentTime, .8);
+  if (v > 0 && ambEl.paused) ambEl.play().catch(() => {});
+  if (ambGain) ambGain.gain.setTargetAtTime(v, actx.currentTime, .8); else { ambVol += (v - ambVol)*.03; ambEl.volume = Math.max(0, Math.min(1, ambVol)); }
+  if (v === 0 && !ambEl.paused && (ambGain ? ambGain.gain.value : ambEl.volume) < .003) ambEl.pause();
 }
 
 let last = performance.now();
