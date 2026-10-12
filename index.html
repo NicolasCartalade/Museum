@@ -1362,6 +1362,7 @@ addEventListener('keydown', e => { if (quizOpen || e.repeat || $('concert').hidd
 
 /* ---------- quiz ---------- */
 let validated = {};
+try { if (/[?&]reset\b/.test(location.search)){ localStorage.removeItem('wm-quiz'); history.replaceState(null, '', location.pathname); } } catch(e){}
 try { validated = JSON.parse(localStorage.getItem('wm-quiz') || '{}') || {}; } catch(e){ validated = {}; }
 function refreshScore(){
   const n = Object.keys(QUIZ).filter(r => validated[r]).length; $('valid').textContent = n;
