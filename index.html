@@ -1005,6 +1005,9 @@ vMathias.team = 'A';
 const s04Front = (g, w) => { g.fillStyle = '#ffffff'; g.beginPath(); g.arc(w*.28, 58, 17, 0, 7); g.fill(); g.fillStyle = '#004d9d'; g.font = '800 15px Karla, Arial'; g.textAlign = 'center'; g.fillText('04', w*.28, 64); };
 const willy = human({name: 'Willy', skin: skinA, hair: 0x2a1b12, pants: lam(0xffffff), sleeve: lam(0x0a2a5e), torso: shirtMats(0x0a2a5e, s04Front, backName('WILLY', '3', '#ffffff'))});
 const vWilly = place(willy, 20.5, 0, 39.8, Math.PI/2, 'willy', {phase: 0, cool: 0, kick: 0, home: [20.5, 39.8], team: 'B'});
+const omFront = (g, w) => { g.fillStyle = '#2faee0'; g.fillRect(0, 0, w, 10); g.beginPath(); g.moveTo(w*.62, 38); g.lineTo(w*.86, 38); g.lineTo(w*.74, 82); g.closePath(); g.fill(); g.fillStyle = '#ffffff'; g.font = '800 15px Karla, Arial'; g.textAlign = 'center'; g.fillText('OM', w*.74, 56); g.fillStyle = '#2faee0'; g.fillRect(w*.2, 120, w*.6, 6); };
+const arthur = human({name: 'Arthur', skin: skinB, hair: 0x3a2616, pants: lam(0xffffff), sleeve: lam(0xffffff), torso: shirtMats(0xffffff, omFront, backName('ARTHUR', '10', '#2faee0'))});
+const vArthur = place(arthur, 23.5, 0, 43.4, -Math.PI/2, 'arthur', {phase: 0, cool: 0, kick: 0, home: [23.5, 43.4], team: 'A'});
 const colFront = (g, w, h) => { g.fillStyle = '#003893'; g.fillRect(0, 0, w, 14); g.fillStyle = '#ce1126'; g.fillRect(0, 14, w, 6); g.fillStyle = '#003893'; g.beginPath(); g.arc(w*.72, 60, 14, 0, 7); g.fill(); };
 const andres = human({name: 'Andrés', skin: skinA, hair: 0x15100c, pants: lam(0x003893), sleeve: lam(0xfcd116), gloves: lam(0xf2f2f2), torso: shirtMats(0xfcd116, colFront, backName('ANDRÉS', '1', '#003893'))});
 const vAndres = place(andres, 29.05, 0, 41.25, -Math.PI/2, 'keeper', {cool: 0, dive: 0, phase: 0});
@@ -1157,7 +1160,7 @@ function walkTo(v, tx, tz, sp, dt){
 function footAI(v, dt, others){
   v.cool -= dt; v.kick -= dt;
   const b = football, bs = Math.hypot(b.vx, b.vz);
-  const players = [vMathias, vHugo, vWilly];
+  const players = [vMathias, vHugo, vWilly, vArthur];
   const chaser = players.filter(q => q.cool <= 0).sort((p, q) => Math.hypot(p.x - b.x, p.z - b.z) - Math.hypot(q.x - b.x, q.z - b.z))[0];
   const chase = chaser === v && inPitch(b.x, b.z) && bs < 1.5 && goalT <= 0;
   if (chase && Math.hypot(b.x - v.x, b.z - v.z) < .55){
@@ -1241,8 +1244,8 @@ function updateVisitors(dt){
       }
       p.g.position.set(v.x, v.dive > 0 ? .15 : 0, v.z); p.g.rotation.y = v.yaw;
     }
-    if (v.kind === 'mathias' || v.kind === 'hugo' || v.kind === 'willy'){ footAI(v, dt); p.g.position.set(v.x, 0, v.z); p.g.rotation.y = v.yaw; }
-    if (v.kind !== 'nico' && v.kind !== 'mathias' && v.kind !== 'hugo' && v.kind !== 'willy' && v.kind !== 'keeper'){
+    if (v.kind === 'mathias' || v.kind === 'hugo' || v.kind === 'willy' || v.kind === 'arthur'){ footAI(v, dt); p.g.position.set(v.x, 0, v.z); p.g.rotation.y = v.yaw; }
+    if (v.kind !== 'nico' && v.kind !== 'mathias' && v.kind !== 'hugo' && v.kind !== 'willy' && v.kind !== 'arthur' && v.kind !== 'keeper'){
       const dx = pos.x - v.x, dz = pos.z - v.z, d = Math.hypot(dx, dz), body = p.g.rotation.y;
       let look = d < 4.5 ? angDiff(body, Math.atan2(dx, dz)) : 0; look = Math.max(-1, Math.min(1, look));
       p.head.rotation.y += (look - p.head.rotation.y) * Math.min(1, dt*3);
