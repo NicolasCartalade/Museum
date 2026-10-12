@@ -486,8 +486,8 @@ rectRoom(3, 25, 27, 32, 35, {doors: {W: [[30.1, 31.9]], E: [[30.1, 31.9]]}, keep
 rectRoom(4, 33, 29, 44, 33, {h: 7, doors: {W: [[30.1, 31.9]], N: [[42.2, 43.8]]}, keep: {N: [[40.5, 42.2]]}});
 rectRoom(5, 34, 20, 44, 28, {h: 5.4, doors: {S: [[42.2, 43.8]], N: [[38.1, 39.9]]}, keep: {N: [[39.9, 41.6]]}});
 rectRoom(6, 34, 11, 44, 19, {doors: {S: [[38.1, 39.9]], N: [[36.1, 37.9]]}, keep: {N: [[37.9, 39.6]]}});
-rectRoom(8, 21, 11, 33, 26, {h: 5.5, doors: {N: [[29.87, 32.14]], W: [[22.6, 24.4]]}, keep: {W: [[20.9, 22.6]], S: [[25.5, 28.5]]}});
-rectRoom(9, 10, 11, 20, 26, {doors: {E: [[22.6, 24.4]], N: [[16.1, 17.9]]}, keep: {N: [[17.9, 19.6]]}});
+rectRoom(8, 10, 18.5, 33, 26, {h: 6, doors: {N: [[11, 13]], E: [[19, 20.8]]}, keep: {W: [[20.6, 23.9]], N: [[13, 15]]}});
+rectRoom(9, 10, 11, 33, 17.5, {doors: {S: [[11, 13]], N: [[16.1, 17.9]]}, keep: {N: [[17.9, 19.8]]}});
 rectRoom(11, 1, 1, 11, 9, {doors: {E: [[4, 6]], S: [[4, 8]]}, keep: {S: [[8, 9.6]]}});
 rectRoom('c', 4, 9, 8, 15, {doors: {N: [[4, 8]], S: [[4, 8]]}});
 rectRoom(12, 0, 15, 9, 23, {doors: {N: [[4, 8]], S: [[6.4, 7.8]]}, keep: {S: [[4.8, 6.4]]}});
@@ -544,8 +544,9 @@ pair([32, 30.1], [32, 31.9], [33, 30.1], [33, 31.9]);
 pair([42.2, 28], [43.8, 28], [42.2, 29], [43.8, 29]);
 pair([38.1, 19], [39.9, 19], [38.1, 20], [39.9, 20]);
 pair([36.1, 9.62], [37.9, 9.62], [36.1, 11], [37.9, 11]);
-pair([33.17, 7.70], [34.30, 8.84], [29.87, 11], [32.14, 11]);
-pair([20, 22.6], [20, 24.4], [21, 22.6], [21, 24.4]);
+pair([33.17, 7.70], [34.30, 8.84], [33, 11], [34, 11]);
+wall(33, 17.5, 33, 18.5, pmat); wall(34, 19, 34, 20, pmat); wall(33, 21.6, 34, 21.6, pmat);
+pair([11, 17.5], [13, 17.5], [11, 18.5], [13, 18.5]);
 pair([16.1, 8.40], [17.9, 9.0], [16.1, 11], [17.9, 11]);
 pair([11, 4], [11, 6], [13.22, 4], [13.22, 6]);
 pair([6.4, 23], [7.8, 23], [6.4, 23.5], [7.8, 23.5]);
@@ -617,11 +618,11 @@ function at(parent, mesh, x, y, z){ mesh.position.set(x || 0, y || 0, z || 0); p
 const box = (w, h, d, mat, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); return m; };
 const SEATS = [];
 function bench(x, z, len, yaw){ SEATS.push({kind: 'bench', x, z, len, yaw: yaw || 0, top: .45}); const b = box(len, .45, .6, mats.bench, x, .225, z); b.rotation.y = yaw || 0; scene.add(b); solid(x, z, len/2, .3, yaw || 0, .45); }
-bench(CX, CZ, 3.4); bench(4.5, 19.6, 2.6); bench(15, 18.5, 2.6, Math.PI/2); bench(39, 24, 2.6); bench(28.5, 33.4, 2.4);
+bench(CX, CZ, 3.4); bench(4.5, 19.6, 2.6); bench(21.5, 14.25, 3); bench(24, 21.6, 3); bench(39, 24, 2.6); bench(28.5, 33.4, 2.4);
 
 /* Bornes de quiz, à la sortie de chaque salle */
-const CENTERS = {1: [13, 31], 2: [20.5, 31], 3: [28.5, 31], 4: [38.5, 31], 5: [39, 24], 6: [39, 15], 7: [37, 5], 8: [27, 18.5], 9: [15, 18.5], 10: [22, 5], 11: [6, 5], 12: [4.5, 19]};
-const KPOS = {1: [15.25, 32.75], 2: [23.25, 32.75], 3: [31.25, 32.75], 4: [41.35, 29.75], 5: [40.75, 20.75], 6: [38.75, 11.75], 7: [35.6, 7.6], 8: [21.75, 21.75], 9: [18.75, 11.75], 10: [14.6, 3.4], 11: [8.85, 8.25], 12: [5.55, 22.25]};
+const CENTERS = {1: [13, 31], 2: [20.5, 31], 3: [28.5, 31], 4: [38.5, 31], 5: [39, 24], 6: [39, 15], 7: [37, 5], 8: [21.5, 22.25], 9: [21.5, 14.25], 10: [22, 5], 11: [6, 5], 12: [4.5, 19]};
+const KPOS = {1: [15.25, 32.75], 2: [23.25, 32.75], 3: [31.25, 32.75], 4: [41.35, 29.75], 5: [40.75, 20.75], 6: [38.75, 11.75], 7: [35.6, 7.6], 8: [14.2, 19.2], 9: [19.1, 11.75], 10: [14.6, 3.4], 11: [8.85, 8.25], 12: [5.55, 22.25]};
 const kiosks = [];
 function screenTex(room, done){
   return canvasTex(256, 168, (g, w, h) => {
@@ -645,17 +646,18 @@ for (const r of Object.keys(KPOS)){
 }
 
 /* Panier de basket (salle 8) */
-const HOOP = {x: 27, y: 3.05, z: 24.7};
+const HOOP = {x: 11.6, y: 3.05, z: 22.25};
 const ballColliders = [];
 {
   const steel = lam(0x2b2f36);
-  scene.add(box(.14, 3.5, .14, steel, 27, 1.75, 25.6)); solid(27, 25.6, .12, .12, 0, 9);
-  scene.add(box(.08, .08, .5, steel, 27, 3.3, 25.35));
+  const hg = new THREE.Group(); hg.position.set(HOOP.x, 0, HOOP.z); hg.rotation.y = -Math.PI/2; scene.add(hg);
+  hg.add(box(.14, 3.5, .14, steel, 0, 1.75, .9)); solid(HOOP.x - .9, HOOP.z, .12, .12, 0, 9);
+  hg.add(box(.08, .08, .5, steel, 0, 3.3, .65));
   const bt = canvasTex(256, 150, (g, w, h) => { g.fillStyle = '#f7f7f7'; g.fillRect(0, 0, w, h); g.strokeStyle = '#d6111e'; g.lineWidth = 6; g.strokeRect(4, 4, w-8, h-8); g.strokeRect(w/2 - 34, h - 70, 68, 52); });
-  const bb = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.05, .05), [lam(0xdddddd), lam(0xdddddd), lam(0xdddddd), lam(0xdddddd), lam(0xdddddd), new THREE.MeshLambertMaterial({map: bt})]);
-  bb.position.set(27, 3.4, 25.08); scene.add(bb); ballColliders.push(bb);
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(.23, .018, 8, 24), lam(0xe0621c)); ring.rotation.x = Math.PI/2; ring.position.set(HOOP.x, HOOP.y, HOOP.z); scene.add(ring);
-  const net = new THREE.Mesh(new THREE.CylinderGeometry(.23, .15, .4, 14, 3, true), new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true})); net.position.set(HOOP.x, HOOP.y - .2, HOOP.z); scene.add(net);
+  const bb = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.05, .05), [lam(0xdddddd), lam(0xdddddd), lam(0xdddddd), lam(0xdddddd), lam(0xdddddd), lam(0xdddddd)]); bb.material[5] = new THREE.MeshLambertMaterial({map: bt});
+  bb.position.set(0, 3.4, .38); hg.add(bb); ballColliders.push(bb);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(.23, .018, 8, 24), lam(0xe0621c)); ring.rotation.x = Math.PI/2; ring.position.set(0, HOOP.y, 0); hg.add(ring);
+  const net = new THREE.Mesh(new THREE.CylinderGeometry(.23, .15, .4, 14, 3, true), new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true})); net.position.set(0, HOOP.y - .2, 0); hg.add(net); hg.updateMatrixWorld(true);
 }
 
 /* Punching-ball (salle 6) */
@@ -781,10 +783,10 @@ function walker(path, skin, speed){
   guards.push({p, sit: false, path, i: 1, x: path[0][0], z: path[0][1], yaw: 0, speed, phase: 0, pause: 0, t: 0});
 }
 seated(14.7, 6.9, 22, 5, 0); seated(1.65, 4.9, 6, 4.9, 2); seated(8.3, 15.8, 4.5, 19, 1);
-seated(15.3, 27.7, 13, 31, 3); seated(34.7, 27.3, 39, 24, 0); seated(10.7, 25.3, 15, 18.5, 2); seated(31.3, 34.3, 28.5, 31, 1);
+seated(15.3, 27.7, 13, 31, 3); seated(34.7, 27.3, 39, 24, 0); seated(32.3, 25.3, 21.5, 22.25, 2); seated(31.3, 34.3, 28.5, 31, 1);
 walker(Array.from({length: 14}, (_, i) => { const t = i/14*2*Math.PI; return [CX + 5.6*Math.cos(t), CZ + 2.5*Math.sin(t)]; }), 3, .75);
 walker([[9.5,5],[3,5],[3,7.5],[6,7.5],[6,13],[4.5,17.6],[2,17.6],[2,21.3],[7,21.3],[7,17.6],[4.5,17.6],[6,13],[6,7.5],[9.5,7.5]], 1, .9);
-walker([[23,13.5],[31,13.5],[31,21],[23,21]], 2, .8);
+walker([[16,20.6],[31,20.6],[31,24.2],[16,24.2]], 2, .8);
 
 const skinA = lam(0xc68863), skinB = lam(0xe0b08a), skinC = lam(0x9a6644), skinD = lam(0xf0c8a4);
 function texMat(w, h, draw){ return new THREE.MeshLambertMaterial({map: canvasTex(w, h, draw)}); }
@@ -985,7 +987,7 @@ const football = makeBall({r: .11, rest: .5, fric: 1.1, home: [22, 41.25], tex: 
   const pent = (x, y, r) => { g.beginPath(); for (let i = 0; i < 5; i++){ const a = -Math.PI/2 + i*2*Math.PI/5; g.lineTo(x + r*Math.cos(a), y + r*Math.sin(a)); } g.fill(); };
   for (let row = 0; row < 3; row++) for (let i = 0; i < 6; i++) pent((i + (row % 2)*.5)*w/6 + 10, 22 + row*42, row === 1 ? 13 : 11);
 })});
-const basket = makeBall({r: .12, rest: .72, fric: .8, home: [27, 22.4], tex: canvasTex(256, 128, (g, w, h) => {
+const basket = makeBall({r: .12, rest: .72, fric: .8, home: [14.5, 22.25], tex: canvasTex(256, 128, (g, w, h) => {
   g.fillStyle = '#d86a1e'; g.fillRect(0, 0, w, h); g.strokeStyle = '#1a1a1a'; g.lineWidth = 4;
   g.beginPath(); g.moveTo(0, h/2); g.lineTo(w, h/2); g.stroke(); for (const x of [w/4, w*3/4]){ g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
   g.beginPath(); g.ellipse(w/2, h/2, w*.18, h*.5, 0, 0, 7); g.stroke();
@@ -1319,8 +1321,8 @@ function viewArt(p){
   const d = Math.min(DMAX[p.room] || 3, Math.max(1.5, .8 + Math.max(p.w, p.h)*1.05));
   stops.push({x: p.x + p.nx*d, z: p.z + p.nz*d, yaw: yawTo(-p.nx, -p.nz), pitch: Math.max(-.3, Math.min(.5, Math.atan2(p.cy - EYE, d))), hold: 2.6 + Math.min(2, p.w*.5), art: p.key});
 }
-const LINK = {'E-1': [[8.0, 31], [11, 31]], '1-2': [[15.4, 31], [17.6, 31]], '2-3': [[23.4, 31], [25.6, 31]], '3-4': [[31.4, 31], [33.6, 31]], '4-5': [[43, 29.7], [43, 27.3]], '5-6': [[39, 20.7], [39, 18.3]], '6-7': [[37, 11.7], [37, 9.0]], '7-8': [[34.4, 7.6], [31.0, 11.7]], '8-9': [[21.7, 23.5], [19.3, 23.5]], '9-10': [[17, 11.7], [17, 8.0]], '10-11': [[14.0, 5], [10.3, 5]], '11-c': [[6, 8.3], [6, 9.7]], 'c-12': [[6, 14.3], [6, 15.7]], '12-A': [[7.1, 22.3], [7.1, 24.6]], 'A-E': [[4.5, 25.3], [4.5, 28]], 'E-K': [[4.5, 34], [4.5, 37.3]], 'K-P': [[12.3, 38], [14.8, 38]]};
-function link(k){ const [a, b] = LINK[k]; way(a[0], a[1], b[0], b[1]); way(b[0], b[1], b[0] + (b[0] - a[0]), b[1] + (b[1] - a[1])); }
+const LINK = {'E-1': [[8.0, 31], [11, 31]], '1-2': [[15.4, 31], [17.6, 31]], '2-3': [[23.4, 31], [25.6, 31]], '3-4': [[31.4, 31], [33.6, 31]], '4-5': [[43, 29.7], [43, 27.3]], '5-6': [[39, 20.7], [39, 18.3]], '6-7': [[37, 11.7], [37, 9.0]], '7-8': [[35.2, 7.0], [33.75, 8.6], [33.5, 11.6], [33.5, 19.9], [31.6, 19.9]], '8-9': [[12, 19.3], [12, 16.7]], '9-10': [[17, 11.7], [17, 8.0]], '10-11': [[14.0, 5], [10.3, 5]], '11-c': [[6, 8.3], [6, 9.7]], 'c-12': [[6, 14.3], [6, 15.7]], '12-A': [[7.1, 22.3], [7.1, 24.6]], 'A-E': [[4.5, 25.3], [4.5, 28]], 'E-K': [[4.5, 34], [4.5, 37.3]], 'K-P': [[12.3, 38], [14.8, 38]]};
+function link(k){ const P = LINK[k]; for (let i = 0; i < P.length; i++){ const a = P[i], b = P[i+1] || [a[0] + (a[0] - P[i-1][0]), a[1] + (a[1] - P[i-1][1])]; way(a[0], a[1], b[0], b[1]); } }
 way(EC.x, EC.z, 10, 31, 1.5);
 const ORDER = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', 'c', '12', 'A'];
 let prev = 'E';
