@@ -29,6 +29,14 @@ canvas{display:block}
 .side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:auto}
 .score{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;font-variant-numeric:tabular-nums;backdrop-filter:blur(6px)}
 .score b{color:var(--gilt)}
+.keys{position:fixed;right:16px;top:50%;transform:translateY(-50%);pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;backdrop-filter:blur(6px);font-size:12px;line-height:1.35;color:var(--ink);display:none;max-width:230px}
+.keys h3{margin:0 0 6px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gilt);font-weight:600}
+.keys dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:5px 8px;align-items:center}
+.keys dt{white-space:nowrap}.keys dd{margin:0;color:var(--muted)}
+.keys kbd{display:inline-block;min-width:18px;padding:1px 5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;background:rgba(243,237,226,.08);font:600 11px/1.4 inherit;text-align:center;color:var(--ink)}
+.keys .sep{grid-column:1/-1;height:1px;background:var(--line);margin:2px 0}
+@media (hover:hover) and (pointer:fine) and (min-width:760px){.keys{display:block}.keys.off{display:none}}
+
 .cartel{background:#efe7d8;color:#211c16;border-radius:2px;padding:10px 14px;min-width:0;max-width:min(420px,100%);box-shadow:0 6px 24px rgba(0,0,0,.35);transition:opacity .4s}
 .cartel .t{font-family:var(--display);font-weight:650;font-size:16px;text-wrap:balance}
 .cartel .a{font-size:13px;margin-top:2px;color:#5a4f40}
@@ -94,6 +102,18 @@ button:focus-visible{outline:2px solid var(--gilt);outline-offset:2px}
     <button id="bTag" class="txt" aria-pressed="false">Taguer</button>
     <button id="bAct" class="txt" hidden>Tirer</button>
   </div>
+  <aside class="keys" id="keys" aria-label="Touches du clavier"><h3>Touches</h3><dl>
+    <dt><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Marcher (ou flèches)</dd>
+    <dt><kbd>Souris</kbd></dt><dd>Regarder · clic pour piloter, <kbd>Échap</kbd> pour libérer</dd>
+    <dt><kbd>Espace</kbd></dt><dd>Sauter</dd>
+    <dt><kbd>F</kbd> <kbd>E</kbd></dt><dd>Action : s’asseoir, tirer, lancer, frapper</dd>
+    <dt><kbd>T</kbd></dt><dd>Taguer un mur</dd>
+    <div class="sep"></div>
+    <dt><kbd>C</kbd></dt><dd>Applaudir (concert)</dd>
+    <dt><kbd>R</kbd></dt><dd>Lancer une rose (concert)</dd>
+    <div class="sep"></div>
+    <dt><kbd>H</kbd></dt><dd>Masquer ce panneau</dd>
+  </dl></aside>
   <div class="help" id="help" hidden>Glisse pour regarder · sur ordinateur, clique pour piloter la caméra à la souris (Échap pour libérer) · ZQSD ou flèches pour marcher · Espace pour sauter · T pour taguer · F pour l’action · au concert : C pour applaudir, R pour lancer une rose</div>
 </div>
 <div id="quiz" hidden>
@@ -1513,6 +1533,7 @@ const KEYMAP = {Space: 'jump', ArrowUp: 'fwd', KeyW: 'fwd', KeyZ: 'fwd', ArrowDo
 addEventListener('keydown', e => {
   if (quizOpen) return;
   if ((e.code === 'KeyF' || e.code === 'KeyE') && !e.repeat){ doAction(); return; }
+  if (e.code === 'KeyH' && !e.repeat){ $('keys').classList.toggle('off'); return; }
   if (e.code === 'KeyT' && !e.repeat){ if (mode !== 'free') setMode('free'); setTag(!tagMode); return; }
   const k = KEYMAP[e.code]; if (k){ keys[k] = true; if (mode !== 'free') setMode('free'); e.preventDefault(); }
 });
@@ -1834,7 +1855,7 @@ function updateAmbient(){
 
 let last = performance.now();
 function tick(now){
-  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
   resize();
   if (!quizOpen){ if (mode === 'tour') tourStep(dt); else freeStep(dt); }
   bowT = Math.max(0, bowT - dt); updateRoses(dt); updateWarp(dt);
