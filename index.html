@@ -229,6 +229,15 @@ const WORKS = {
   ['lapicque', 'Charles Lapicque', 'Peintre et ingénieur', 50, 40, 1],
   ['weil', 'Fernand Weil', 'Archives', 50, 40, 1]]
 };
+const DATES = {fayoum:'IIe siècle', vague:'1831', okazaki:'1833', coree:'XVIIIe siècle', eustache:'vers 1438', portinari:'vers 1470', goodhart:'vers 1320', adoration:'vers 1475',
+ apollon:'vers 1470', botticelli:'vers 1490', tobie:'vers 1496', lippi:'vers 1485', peche:'1509', sibylle:'1510', assomption:'1577', titien:'1558', parmigianino:'1527', saintluc:'1565', giorgione:'vers 1510',
+ cordoba:'1650', satyres:'vers 1618', vieille:'1618', abricots:'1635', abraham:'vers 1650', musiciens:'1595', balancoire:'vers 1750', toton:'1738', automne:'1749', greuze:'1776', vertueuse:'1762', ruines:'1760', mestre:'1740',
+ smalah:'1845', femmesalger:'1834', marcaurele:'1844', sanadrian:'1804', rochejaquelein:'1817', gonzague:'1780', parthenon:'1871', falstaff:'1792', pecheurs:'1796', leversoleil:'1845', fontaine:'1786', messine:'1820', drapeaux:'1830', bainturc:'1870', ermita:'1788', soirnuages:'1824', friedsoleil:'1818',
+ dansevie:'1900', grandpere:'1874', gardeuse:'1891', clavecin:'1880', fideles:'1890', ottmann:'1910', puitsnoir:'1865', daubigny:'1870', cantique:'1893', repine:'1874', communiante:'1875', arbrevie:'1909',
+ saintadresse:'1867', meragitee:'1883', falaises:'1885', trouville:'1870', tilleuls:'1882', peupliers:'1891', grandcanal:'1908', nympheas:'1897', bassin:'1899', ombrelle:'1886', promenade:'1875', moulin:'1876', irene:'1880', durandruel:'1882', murer:'1877', nucouche:'1909', longchamp:'1871', tortoni:'1878',
+ terrasse:'1888', amandier:'1890', iris:'1889', cypres:'1890', fermeprov:'1888', paysanne:'1885', iaorana:'1891', arearea:'1894', breton:'1894', victoire:'1895', montbriand:'1887', chaise:'1888', tournesols:'1888',
+ danse2:'1910', joie:'1906', fenetre:'1913', probleme:'1964', femmeartiste:'1913', artilleurs:'1893', chakoska:'1917', odalisque:'1926', collioure:'1905', alger:'1880', pastorale:'1905', derain:'1906',
+ victorienne:'1851', lapicque:'vers 1950', weil:'XXe siècle'};
 
 /* Quiz : 3 questions par salle, la bonne réponse est l'index c */
 const QUIZ = {
@@ -362,7 +371,7 @@ function goldFill(g, x0, y0, x1, y1){
   gr.addColorStop(0, '#9c7426'); gr.addColorStop(.35, '#f3d98b'); gr.addColorStop(.55, '#d6ac4f'); gr.addColorStop(1, '#8a621d');
   return gr;
 }
-function dims(a){ const f = v => String(Math.round(v*10)/10).replace('.', ','); return (a.approx ? '≈ ' : '') + f(a.h) + ' × ' + f(a.w) + ' cm'; }
+function dims(a){ const f = v => String(Math.round(v)).replace('.', ','); return (DATES[a.key] ? DATES[a.key] + ' · ' : '') + f(a.h) + ' × ' + f(a.w) + ' cm'; }
 function cartelTex(a){
   return canvasTex(512, 200, (g, w, h) => {
     g.fillStyle = '#0d0b0a'; g.fillRect(0,0,w,h);
@@ -381,7 +390,7 @@ function cartelTex(a){
     while (g.measureText(sub).width > w - 50 && fs > 12){ fs -= 1; g.font = `700 ${fs}px Karla, Arial, sans-serif`; }
     const by = y0 + lines.length*34 + 6;
     g.fillStyle = goldFill(g, 0, by - 14, 0, by + 14); g.fillText(sub, w/2, by);
-    g.font = '600 17px Karla, Arial, sans-serif'; g.fillStyle = '#b39257';
+    g.font = '600 17px Karla, Arial, sans-serif'; g.fillStyle = '#b39257'; { const t = dims(a) + (a.scaled ? ' · réduit pour tenir au mur' : ''); let fs2 = 17; while (g.measureText(t).width > w - 40 && fs2 > 11){ fs2--; g.font = '600 ' + fs2 + 'px Karla, Arial, sans-serif'; } }
     g.fillText(dims(a) + (a.scaled ? ' · réduit pour tenir au mur' : ''), w/2, by + 30);
   });
 }
