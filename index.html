@@ -472,6 +472,10 @@ function rectRoom(id, x0, z0, x1, z1, o){
   for (const k of ['N', 'E', 'S', 'W']){
     const [f, a, b, nx, nz, ax] = sides[k];
     const pt = s => ax === 'x' ? [s, f] : [f, s];
+    if (h > H) for (const [s, e] of (o.doors || {})[k] || []){
+      const p = pt(s), q = pt(e), L = Math.hypot(q[0] - p[0], q[1] - p[1]), m = new THREE.Mesh(new THREE.BoxGeometry(L + .02, h - H + .02, .2), mat);
+      m.position.set((p[0] + q[0])/2, H + (h - H)/2 - .01, (p[1] + q[1])/2); m.rotation.y = -Math.atan2(q[1] - p[1], q[0] - p[0]); scene.add(m); walls.push(m);
+    }
     for (const [s, e] of subtract(a, b, (o.doors || {})[k])){
       const p = pt(s), q = pt(e); wall(p[0], p[1], q[0], q[1], mat, h);
       if (o.noHang) continue;
