@@ -592,6 +592,7 @@ function hangRoom(room, keep){
   for (const sg of S){
     if (!sg.items.length) continue;
     if (keep) sg.items.sort((p, q) => list.indexOf(p) - list.indexOf(q));
+    else if (String(room) === '8'){ let seed = 8 + sg.items.length*31; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647; const arr = sg.items.slice().sort((p, q) => list.indexOf(p) - list.indexOf(q)); for (let i = arr.length - 1; i > 0; i--){ const j = Math.floor(rnd()*(i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } sg.items = arr; }
     else { const by = sg.items.slice().sort((p, q) => q.w*q.h - p.w*p.h), arr = []; by.forEach((a, i) => i % 2 ? arr.unshift(a) : arr.push(a)); sg.items = arr; }
     const tot = sg.items.reduce((t, a) => t + a.w/100*(a.scale || 1), 0), gap = (sg.s.len - tot)/(sg.items.length + 1);
     let s = gap;
