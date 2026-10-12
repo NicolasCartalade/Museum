@@ -963,7 +963,14 @@ const vMathias = place(mathias, 25.5, 0, 41.25, -Math.PI/2, 'mathias', {phase: 0
 const bdxFront = (g, w, h) => { g.strokeStyle = '#ffffff'; g.lineWidth = 34; g.lineCap = 'butt'; g.beginPath(); g.moveTo(18, -10); g.lineTo(w/2, 150); g.lineTo(w - 18, -10); g.stroke(); g.fillStyle = '#ffffff'; g.beginPath(); g.arc(w*.27, 190, 13, 0, 7); g.fill(); };
 const bdxBack = (g, w, h) => { g.strokeStyle = '#ffffff'; g.lineWidth = 30; g.beginPath(); g.moveTo(18, -10); g.lineTo(w/2, 60); g.lineTo(w - 18, -10); g.stroke(); g.fillStyle = '#ffffff'; g.textAlign = 'center'; g.font = '800 34px Karla, Arial, sans-serif'; g.fillText('HUGO', w/2, 112); g.font = '900 100px Karla, Arial, sans-serif'; g.fillText('4', w/2, 215); };
 const hugo = human({name: 'Hugo', skin: skinD, hair: 0x6a4a2c, pants: lam(0xffffff), sleeve: lam(0x0b1d3a), torso: shirtMats(0x0b1d3a, bdxFront, bdxBack)});
-const vHugo = place(hugo, 18.5, 0, 41.25, Math.PI/2, 'hugo', {phase: 0, cool: 0, kick: 0, home: [18.5, 41.25]});
+const vHugo = place(hugo, 18.5, 0, 42.6, Math.PI/2, 'hugo', {phase: 0, cool: 0, kick: 0, home: [18.5, 42.6], team: 'B'});
+vMathias.team = 'A';
+const s04Front = (g, w) => { g.fillStyle = '#ffffff'; g.beginPath(); g.arc(w*.28, 58, 17, 0, 7); g.fill(); g.fillStyle = '#004d9d'; g.font = '800 15px Karla, Arial'; g.textAlign = 'center'; g.fillText('04', w*.28, 64); };
+const willy = human({name: 'Willy', skin: skinA, hair: 0x2a1b12, pants: lam(0xffffff), sleeve: lam(0x0a2a5e), torso: shirtMats(0x0a2a5e, s04Front, backName('WILLY', '3', '#ffffff'))});
+const vWilly = place(willy, 20.5, 0, 39.8, Math.PI/2, 'willy', {phase: 0, cool: 0, kick: 0, home: [20.5, 39.8], team: 'B'});
+const colFront = (g, w, h) => { g.fillStyle = '#003893'; g.fillRect(0, 0, w, 14); g.fillStyle = '#ce1126'; g.fillRect(0, 14, w, 6); g.fillStyle = '#003893'; g.beginPath(); g.arc(w*.72, 60, 14, 0, 7); g.fill(); };
+const andres = human({name: 'Andrés', skin: skinA, hair: 0x15100c, pants: lam(0x003893), sleeve: lam(0xfcd116), gloves: lam(0xf2f2f2), torso: shirtMats(0xfcd116, colFront, backName('ANDRÉS', '1', '#003893'))});
+const vAndres = place(andres, 29.05, 0, 41.25, -Math.PI/2, 'keeper', {cool: 0, dive: 0, phase: 0});
 
 /* notes de musique qui s'envolent de la scène */
 const noteTex = ['♪', '♫'].map(ch => canvasTex(64, 64, (g, w, h) => { g.fillStyle = '#e6c56a'; g.font = '700 52px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ch, w/2, h/2); }));
@@ -1113,11 +1120,11 @@ function walkTo(v, tx, tz, sp, dt){
 function footAI(v, dt, others){
   v.cool -= dt; v.kick -= dt;
   const b = football, bs = Math.hypot(b.vx, b.vz);
-  const players = [vMathias, vHugo];
+  const players = [vMathias, vHugo, vWilly];
   const chaser = players.filter(q => q.cool <= 0).sort((p, q) => Math.hypot(p.x - b.x, p.z - b.z) - Math.hypot(q.x - b.x, q.z - b.z))[0];
   const chase = chaser === v && inPitch(b.x, b.z) && bs < 1.5 && goalT <= 0;
   if (chase && Math.hypot(b.x - v.x, b.z - v.z) < .55){
-    const mate = players.find(q => q !== v), meIn = inPitch(pos.x, pos.z);
+    const mate = players.find(q => q !== v && q.team === v.team), meIn = inPitch(pos.x, pos.z);
     let tx, tz, sp;
     if (mate && Math.random() < .65){ tx = mate.x; tz = mate.z; sp = Math.min(8, 2.4 + Math.hypot(tx - b.x, tz - b.z)*.8); }
     else if (meIn && Math.random() < .6){ tx = pos.x; tz = pos.z; sp = Math.min(8, 2.4 + Math.hypot(tx - b.x, tz - b.z)*.8); }
@@ -1184,8 +1191,21 @@ function updateVisitors(dt){
       p.g.position.set(v.x, v.y, v.z); p.g.rotation.y = v.yaw;
     }
     if (bowT > 0 && (v.kind === 'piano' || v.kind === 'guitar' || (v.kind === 'nico' && v.state === 'sing'))) p.head.rotation.x = Math.max(p.head.rotation.x, .55*Math.sin(Math.PI*Math.min(1, (2.6 - bowT)/2.6)));
-    if (v.kind === 'mathias' || v.kind === 'hugo'){ footAI(v, dt); p.g.position.set(v.x, 0, v.z); p.g.rotation.y = v.yaw; }
-    if (v.kind !== 'nico' && v.kind !== 'mathias' && v.kind !== 'hugo'){
+    if (v.kind === 'keeper'){
+      v.cool -= dt; v.dive = Math.max(0, v.dive - dt);
+      const b = football, tz = Math.max(40.1, Math.min(42.4, inPitch(b.x, b.z) ? 41.25 + (b.z - 41.25)*.75 : 41.25));
+      const dz = tz - v.z, st = Math.min(Math.abs(dz), 2.6*dt)*Math.sign(dz); v.z += st;
+      v.yaw += angDiff(v.yaw, Math.atan2(b.x - v.x, b.z - v.z))*Math.min(1, dt*6);
+      if (Math.abs(st) > .002){ v.phase += dt*9; walkAnim(p, v.phase, .6); } else walkAnim(p, 0, 0);
+      p.arms.forEach((a, i) => { a.rotation.x = v.dive > 0 ? -2.6 : -.55; a.rotation.z = (i ? 1 : -1)*(v.dive > 0 ? .35 : .45); });
+      if (v.cool <= 0 && b.vx > 1 && b.x > 27.6 && b.x < 29.5 && Math.abs(b.z - v.z) < 1.1 && b.y < 1.9){
+        v.cool = 1.2;
+        if (Math.random() < .7){ v.z += (b.z - v.z)*.8; v.dive = .6; kickBall(b, -1, (Math.random() - .5)*.7, 7.5, 2.4); say('Arrêt d’Andrés !', 'Le gardien colombien sort la balle.', 1500); }
+      }
+      p.g.position.set(v.x, v.dive > 0 ? .15 : 0, v.z); p.g.rotation.y = v.yaw;
+    }
+    if (v.kind === 'mathias' || v.kind === 'hugo' || v.kind === 'willy'){ footAI(v, dt); p.g.position.set(v.x, 0, v.z); p.g.rotation.y = v.yaw; }
+    if (v.kind !== 'nico' && v.kind !== 'mathias' && v.kind !== 'hugo' && v.kind !== 'willy' && v.kind !== 'keeper'){
       const dx = pos.x - v.x, dz = pos.z - v.z, d = Math.hypot(dx, dz), body = p.g.rotation.y;
       let look = d < 4.5 ? angDiff(body, Math.atan2(dx, dz)) : 0; look = Math.max(-1, Math.min(1, look));
       p.head.rotation.y += (look - p.head.rotation.y) * Math.min(1, dt*3);
