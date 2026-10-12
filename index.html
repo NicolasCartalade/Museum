@@ -230,8 +230,7 @@ const WORKS = {
   ['derain', 'Trois Personnages assis dans l’herbe', 'André Derain', 38, 55, 1]],
  A: [
   ['victorienne', 'Peinture victorienne', 'Angleterre, XIXe siècle', 60, 80, 1],
-  ['lapicque', 'Charles Lapicque', 'Peintre et ingénieur', 50, 40, 1],
-  ['weil', 'Fernand Weil', 'Archives', 50, 40, 1]]
+  ['lapicque', 'Charles Lapicque', 'Peintre et ingénieur', 50, 40, 1]]
 };
 const DATES = {fayoum:'IIe siècle', vague:'1831', okazaki:'1833', coree:'XVIIIe siècle', eustache:'vers 1438', portinari:'vers 1470', goodhart:'vers 1320', adoration:'vers 1475',
  apollon:'vers 1470', botticelli:'vers 1490', tobie:'vers 1496', lippi:'vers 1485', peche:'1509', sibylle:'1510', assomption:'1577', titien:'1558', parmigianino:'1527', saintluc:'1565', giorgione:'vers 1510',
@@ -241,7 +240,7 @@ const DATES = {fayoum:'IIe siècle', vague:'1831', okazaki:'1833', coree:'XVIIIe
  saintadresse:'1867', meragitee:'1883', falaises:'1885', trouville:'1870', tilleuls:'1882', peupliers:'1891', grandcanal:'1908', nympheas:'1897', bassin:'1899', ombrelle:'1886', promenade:'1875', moulin:'1876', irene:'1880', durandruel:'1882', murer:'1877', nucouche:'1909', longchamp:'1871', tortoni:'1878',
  terrasse:'1888', amandier:'1890', iris:'1889', cypres:'1890', fermeprov:'1888', paysanne:'1885', iaorana:'1891', arearea:'1894', breton:'1894', victoire:'1895', montbriand:'1887', chaise:'1888', tournesols:'1888',
  danse2:'1910', joie:'1906', fenetre:'1913', probleme:'1964', femmeartiste:'1913', artilleurs:'1893', chakoska:'1917', odalisque:'1926', collioure:'1905', alger:'1880', pastorale:'1905', derain:'1906',
- victorienne:'1851', lapicque:'vers 1950', weil:'XXe siècle'};
+ victorienne:'1851', lapicque:'vers 1950'};
 
 /* Quiz : 3 questions par salle, la bonne réponse est l'index c */
 const QUIZ = {
@@ -1292,7 +1291,7 @@ warpTex.wrapS = THREE.RepeatWrapping; warpTex.repeat.set(2.5, 1);
 const warpMat = new THREE.MeshBasicMaterial({map: warpTex, side: THREE.DoubleSide});
 for (const [x, ry, len, zc] of [[32.12, Math.PI/2, 7.95, 15.0], [33.88, -Math.PI/2, 10.4, 16.2]]){ const m = new THREE.Mesh(new THREE.PlaneGeometry(len, H), warpMat); m.position.set(x, H/2, zc); m.rotation.y = ry; scene.add(m); }
 { const end = new THREE.Mesh(new THREE.PlaneGeometry(1.8, H), warpMat); end.position.set(33, H/2, 21.48); end.rotation.y = Math.PI; scene.add(end); }
-{ const c = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 10.4), warpMat); c.rotation.x = Math.PI/2; c.rotation.z = Math.PI/2; c.position.set(33, H - .01, 16.2); scene.add(c);
+{ const c = new THREE.Mesh(new THREE.PlaneGeometry(10.4, 1.86), warpMat); c.rotation.order = 'YXZ'; c.rotation.y = Math.PI/2; c.rotation.x = Math.PI/2; c.position.set(33, H - .01, 16.2); scene.add(c);
   const fl = canvasTex(64, 512, (g, w, h) => { g.fillStyle = '#07041a'; g.fillRect(0, 0, w, h); g.fillStyle = '#7ef9ff'; for (let y = 0; y < h; y += 32) g.fillRect(w/2 - 3, y, 6, 16); g.fillStyle = 'rgba(126,249,255,.35)'; g.fillRect(0, 0, 3, h); g.fillRect(w - 3, 0, 3, h); });
   fl.wrapT = THREE.RepeatWrapping; fl.repeat.set(1, 4);
   const f = new THREE.Mesh(new THREE.PlaneGeometry(1.86, 10.4), new THREE.MeshBasicMaterial({map: fl})); f.rotation.x = -Math.PI/2; f.position.set(33, .012, 16.2); scene.add(f); warpFloor = fl; }
