@@ -1213,7 +1213,7 @@ function updateVisitors(dt){
       p.arms.forEach((a, i) => { a.rotation.x = v.dive > 0 ? -2.6 : -.55; a.rotation.z = (i ? 1 : -1)*(v.dive > 0 ? .35 : .45); });
       if (v.cool <= 0 && b.vx > 1 && b.x > 27.6 && b.x < 29.5 && Math.abs(b.z - v.z) < 1.1 && b.y < 1.9){
         v.cool = 1.2;
-        if (Math.random() < .7){ v.z += (b.z - v.z)*.8; v.dive = .6; kickBall(b, -1, (Math.random() - .5)*.7, 7.5, 2.4); say('Arrêt d’Andrés !', 'Le gardien colombien sort la balle.', 1500); }
+        if (Math.random() < .7){ v.z += (b.z - v.z)*.8; v.dive = .6; kickBall(b, -1, (Math.random() - .5)*.7, 7.5, 2.4); if (roomAt(pos.x, pos.z) === 'P') say('Arrêt d’Andrés !', 'Le gardien colombien sort la balle.', 1500); }
       }
       p.g.position.set(v.x, v.dive > 0 ? .15 : 0, v.z); p.g.rotation.y = v.yaw;
     }
