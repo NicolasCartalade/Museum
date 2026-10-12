@@ -29,7 +29,6 @@ canvas{display:block}
 .side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:auto}
 .score{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;font-variant-numeric:tabular-nums;backdrop-filter:blur(6px)}
 .score b{color:var(--gilt)}
-#score{pointer-events:auto;cursor:pointer}
 .cartel{background:#efe7d8;color:#211c16;border-radius:2px;padding:10px 14px;min-width:0;max-width:min(420px,100%);box-shadow:0 6px 24px rgba(0,0,0,.35);transition:opacity .4s}
 .cartel .t{font-family:var(--display);font-weight:650;font-size:16px;text-wrap:balance}
 .cartel .a{font-size:13px;margin-top:2px;color:#5a4f40}
@@ -69,7 +68,7 @@ button:focus-visible{outline:2px solid var(--gilt);outline-offset:2px}
 <div class="hud top">
   <div class="room"><small id="roomNo">Entrée</small><b id="roomName">Accueil du musée</b></div>
   <div class="side">
-    <div class="score" id="score" role="button" tabindex="0" title="Remettre les quiz à zéro">Salles validées <b id="valid">0</b>/12</div>
+    <div class="score" id="score">Salles validées <b id="valid">0</b>/12</div>
     <button id="bSound" aria-pressed="true">Son</button>
   </div>
 </div>
@@ -1365,7 +1364,6 @@ addEventListener('keydown', e => { if (quizOpen || e.repeat || $('concert').hidd
 let validated = {};
 try { if (/[?&]reset\b/.test(location.search)){ localStorage.removeItem('wm-quiz'); history.replaceState(null, '', location.pathname); } } catch(e){}
 try { validated = JSON.parse(localStorage.getItem('wm-quiz') || '{}') || {}; } catch(e){ validated = {}; }
-$('score').onclick = () => { if (confirm('Remettre les quiz à zéro et reverrouiller la salle secrète ?')){ validated = {}; try { localStorage.removeItem('wm-quiz'); } catch(e){} location.replace(location.pathname + '?r=' + Date.now()); } };
 function refreshScore(){
   const n = Object.keys(QUIZ).filter(r => validated[r]).length; $('valid').textContent = n;
   kiosks.forEach(k => { const done = !!validated[k.room]; if (k.done !== done){ k.done = done; k.scr.material.map = screenTex(k.room, done); k.scr.material.needsUpdate = true; } });
