@@ -334,13 +334,13 @@ scene.add(new THREE.HemisphereLight(0xfff8ee, 0x5a4a3c, 0.95));
 const sun = new THREE.DirectionalLight(0xffffff, 0.5); sun.position.set(8, 20, 14); scene.add(sun);
 const sun2 = new THREE.DirectionalLight(0xfff1d6, 0.35); sun2.position.set(30, 10, -10); scene.add(sun2);
 
-let lastW = 0, lastH = 0;
+let lastW = 0, lastH = 0, baseFov = 62;
 function resize(){
   const r = stage.getBoundingClientRect();
   const w = Math.round(r.width || innerWidth || document.documentElement.clientWidth || screen.width || 390);
   const h = Math.round(r.height || innerHeight || document.documentElement.clientHeight || screen.height || 700);
   if (w < 10 || h < 10 || (w === lastW && h === lastH)) return;
-  lastW = w; lastH = h; renderer.setSize(w, h); cam.aspect = w/h; cam.fov = w < h ? 74 : 62; cam.updateProjectionMatrix();
+  lastW = w; lastH = h; renderer.setSize(w, h); cam.aspect = w/h; baseFov = cam.fov = w < h ? 74 : 62; cam.updateProjectionMatrix();
 }
 addEventListener('resize', resize); addEventListener('orientationchange', resize);
 if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
@@ -490,8 +490,8 @@ rectRoom(3, 25, 27, 32, 35, {doors: {W: [[30.1, 31.9]], E: [[30.1, 31.9]]}, keep
 rectRoom(4, 33, 29, 44, 33, {h: 7, doors: {W: [[30.1, 31.9]], N: [[42.2, 43.8]]}, keep: {N: [[40.5, 42.2]]}});
 rectRoom(5, 34, 20, 44, 28, {h: 5.4, doors: {S: [[42.2, 43.8]], N: [[38.1, 39.9]]}, keep: {N: [[39.9, 41.6]]}});
 rectRoom(6, 34, 11, 44, 19, {doors: {S: [[38.1, 39.9]], N: [[36.1, 37.9]]}, keep: {N: [[37.9, 39.6]]}});
-rectRoom(8, 10, 18.5, 33, 26, {h: 6, doors: {N: [[11, 13]], E: [[19, 20.8]]}, keep: {W: [[20.6, 23.9]], N: [[13, 15]]}});
-rectRoom(9, 10, 11, 33, 17.5, {doors: {S: [[11, 13]], N: [[16.1, 17.9]]}, keep: {N: [[17.9, 19.8]]}});
+rectRoom(8, 9.3, 18.5, 32, 26, {h: 6.4, doors: {N: [[11, 13]], E: [[19, 20.8]]}, keep: {W: [[20.6, 23.9]], N: [[13, 15]]}});
+rectRoom(9, 10, 11, 32, 17.5, {doors: {S: [[11, 13]], N: [[16.1, 17.9]]}, keep: {N: [[17.9, 19.8]]}});
 rectRoom(11, 1, 1, 11, 9, {doors: {E: [[4, 6]], S: [[4, 8]]}, keep: {S: [[8, 9.6]]}});
 rectRoom('c', 4, 9, 8, 15, {doors: {N: [[4, 8]], S: [[4, 8]]}});
 rectRoom(12, 0, 15, 9, 23, {doors: {N: [[4, 8]], S: [[6.4, 7.8]]}, keep: {S: [[4.8, 6.4]]}});
@@ -548,8 +548,8 @@ pair([32, 30.1], [32, 31.9], [33, 30.1], [33, 31.9]);
 pair([42.2, 28], [43.8, 28], [42.2, 29], [43.8, 29]);
 pair([38.1, 19], [39.9, 19], [38.1, 20], [39.9, 20]);
 pair([36.1, 9.62], [37.9, 9.62], [36.1, 11], [37.9, 11]);
-pair([33.17, 7.70], [34.30, 8.84], [33, 11], [34, 11]);
-wall(33, 17.5, 33, 18.5, pmat); wall(34, 19, 34, 20, pmat); wall(33, 21.6, 34, 21.6, pmat);
+pair([33.17, 7.70], [34.30, 8.84], [32, 11], [34, 11]);
+wall(32, 17.5, 32, 18.5, pmat); wall(34, 19, 34, 20, pmat); wall(32, 21.6, 34, 21.6, pmat);
 pair([11, 17.5], [13, 17.5], [11, 18.5], [13, 18.5]);
 pair([16.1, 8.40], [17.9, 9.0], [16.1, 11], [17.9, 11]);
 pair([11, 4], [11, 6], [13.22, 4], [13.22, 6]);
@@ -567,12 +567,13 @@ pair([13, 37.2], [13, 38.8], [14, 37.2], [14, 38.8]);
 /* ---------- accrochage à taille réelle ---------- */
 function hangWork(a, x, z, nx, nz, room){
   const roomH = ROOMH[room] || H, w = a.w/100*(a.scale || 1), h = a.h/100*(a.scale || 1);
-  let cy = Math.max(1.62, h/2 + .78); if (cy + h/2 > roomH - .25) cy = Math.max(h/2 + .3, roomH - .25 - h/2);
+  const cwP = Math.max(.42, Math.min(.8, w*.6)), chP = cwP*200/512, bP = Math.min(.2, .06 + Math.max(w, h)*.03) + .022;
+  let cy = Math.max(1.62, h/2 + .78, h/2 + bP + .06 + chP + .28); if (cy + h/2 > roomH - .25) cy = Math.max(h/2 + .3, roomH - .25 - h/2);
   const o = .19, phi = Math.atan2(nx, nz);
   const g = new THREE.Group(); g.position.set(x + nx*o, cy, z + nz*o); g.rotation.y = phi;
   const border = frame(g, w, h);
   let mat;
-  if (a.src){ const tex = loader.load(a.src); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 4; mat = new THREE.MeshBasicMaterial({map: tex}); }
+  if (a.src){ const tex = loader.load(a.src); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = renderer.capabilities.getMaxAnisotropy ? Math.min(16, renderer.capabilities.getMaxAnisotropy()) : 4; mat = new THREE.MeshBasicMaterial({map: tex}); }
   else { const t = linen.clone(); t.needsUpdate = true; t.repeat.set(Math.max(1, w/.5), Math.max(1, h/.5)); mat = new THREE.MeshBasicMaterial({map: t}); }
   const p = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat); p.position.z = .01; g.add(p);
   if (!a.src){ const lw = Math.min(.56, w*.85); const lb = new THREE.Mesh(new THREE.PlaneGeometry(lw, lw/4), soonMat); lb.position.z = .015; g.add(lb); }
@@ -608,8 +609,9 @@ function hangRoom(room, keep){
 hangRoom(10, true);
 
 /* ---------- où suis-je ? ---------- */
-const ROOMS = {E: ['Entrée', 'Accueil du musée'], 1: ['Salle 1', 'Antiquité et Orient'], 2: ['Salle 2', 'Gothique et première Renaissance'], 3: ['Salle 3', 'Renaissance florentine'], 4: ['Salle 4', 'La Sixtine'], 5: ['Salle 5', 'Venise et maniérisme'], 6: ['Salle 6', 'Le Grand Siècle'], 7: ['Salle 7', 'Lumières et rococo'], 8: ['Salle 8', 'Romantisme et orientalisme'], 9: ['Salle 9', 'Réalisme et symbolisme'], 10: ['Salle 10', 'Impressionnisme'], 11: ['Salle 11', 'Post-impressionnisme'], c: ['Couloir', 'Couloir de l’amitié'], 12: ['Salle 12', 'Fauvisme et modernités'], A: ['Archives', 'Œuvres disparues et archives'], K: ['Salle de concert', 'Nodí tri · Kuatu Kadéra'], P: ['Terrain de sport', 'Le foot du musée'], p: ['Passage', 'Entre deux salles']};
+const ROOMS = {W: ['Faille spatiale', 'Couloir de l’hyperespace'], E: ['Entrée', 'Accueil du musée'], 1: ['Salle 1', 'Antiquité et Orient'], 2: ['Salle 2', 'Gothique et première Renaissance'], 3: ['Salle 3', 'Renaissance florentine'], 4: ['Salle 4', 'La Sixtine'], 5: ['Salle 5', 'Venise et maniérisme'], 6: ['Salle 6', 'Le Grand Siècle'], 7: ['Salle 7', 'Lumières et rococo'], 8: ['Salle 8', 'Romantisme et orientalisme'], 9: ['Salle 9', 'Réalisme et symbolisme'], 10: ['Salle 10', 'Impressionnisme'], 11: ['Salle 11', 'Post-impressionnisme'], c: ['Couloir', 'Couloir de l’amitié'], 12: ['Salle 12', 'Fauvisme et modernités'], A: ['Archives', 'Œuvres disparues et archives'], K: ['Salle de concert', 'Nodí tri · Kuatu Kadéra'], P: ['Terrain de sport', 'Le foot du musée'], p: ['Passage', 'Entre deux salles']};
 function roomAt(x, z){
+  if (x > 32.05 && x < 33.95 && z > 9.2 && z < 21.6) return 'W';
   if (((x-CX)/RX)**2 + ((z-CZ)/RZ)**2 < 1) return '10';
   if (Math.hypot(x - OC.x, z - OC.z) < 4.6) return '7';
   if (Math.hypot(x - EC.x, z - EC.z) < EC.r) return 'E';
@@ -650,7 +652,7 @@ for (const r of Object.keys(KPOS)){
 }
 
 /* Panier de basket (salle 8) */
-const HOOP = {x: 11.6, y: 3.05, z: 22.25};
+const HOOP = {x: 10.95, y: 3.05, z: 22.25};
 const ballColliders = [];
 {
   const steel = lam(0x2b2f36);
@@ -790,7 +792,7 @@ function walker(path, skin, speed){
   guards.push({p, sit: false, path, i: 1, x: path[0][0], z: path[0][1], yaw: 0, speed, phase: 0, pause: 0, t: 0});
 }
 seated(14.7, 6.9, 22, 5, 0); seated(1.65, 4.9, 6, 4.9, 2); seated(8.3, 15.8, 4.5, 19, 1);
-seated(15.3, 27.7, 13, 31, 3); seated(34.7, 27.3, 39, 24, 0); seated(32.3, 25.3, 21.5, 22.25, 2); seated(31.3, 34.3, 28.5, 31, 1);
+seated(15.3, 27.7, 13, 31, 3); seated(34.7, 27.3, 39, 24, 0); seated(31.3, 25.3, 20.6, 22.25, 2); seated(31.3, 34.3, 28.5, 31, 1);
 walker(Array.from({length: 14}, (_, i) => { const t = i/14*2*Math.PI; return [CX + 5.6*Math.cos(t), CZ + 2.5*Math.sin(t)]; }), 3, .75);
 walker([[9.5,5],[3,5],[3,7.5],[6,7.5],[6,13],[4.5,17.6],[2,17.6],[2,21.3],[7,21.3],[7,17.6],[4.5,17.6],[6,13],[6,7.5],[9.5,7.5]], 1, .9);
 walker([[16,20.6],[31,20.6],[31,24.2],[16,24.2]], 2, .8);
@@ -1005,7 +1007,7 @@ const football = makeBall({r: .11, rest: .5, fric: 1.1, home: [22, 41.25], tex: 
   const pent = (x, y, r) => { g.beginPath(); for (let i = 0; i < 5; i++){ const a = -Math.PI/2 + i*2*Math.PI/5; g.lineTo(x + r*Math.cos(a), y + r*Math.sin(a)); } g.fill(); };
   for (let row = 0; row < 3; row++) for (let i = 0; i < 6; i++) pent((i + (row % 2)*.5)*w/6 + 10, 22 + row*42, row === 1 ? 13 : 11);
 })});
-const basket = makeBall({r: .12, rest: .72, fric: .8, home: [14.5, 22.25], tex: canvasTex(256, 128, (g, w, h) => {
+const basket = makeBall({r: .12, rest: .72, fric: .8, home: [13.8, 22.25], tex: canvasTex(256, 128, (g, w, h) => {
   g.fillStyle = '#d86a1e'; g.fillRect(0, 0, w, h); g.strokeStyle = '#1a1a1a'; g.lineWidth = 4;
   g.beginPath(); g.moveTo(0, h/2); g.lineTo(w, h/2); g.stroke(); for (const x of [w/4, w*3/4]){ g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
   g.beginPath(); g.ellipse(w/2, h/2, w*.18, h*.5, 0, 0, 7); g.stroke();
@@ -1275,6 +1277,37 @@ function updateAudio(){
 addEventListener('pointerdown', initAudio); addEventListener('keydown', initAudio);
 $('bSound').onclick = () => { soundOn = !soundOn; $('bSound').setAttribute('aria-pressed', soundOn); if (soundOn) initAudio(); };
 
+/* ---------- faille spatiale (couloir 7 → 8) ---------- */
+let warp = 0, lastFov = 0, warpFloor = null;
+const warpTex = canvasTex(1024, 256, (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#05030f'); gr.addColorStop(.5, '#120a35'); gr.addColorStop(1, '#05030f'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 260; i++){ const x = Math.random()*w, y = Math.random()*h, l = 20 + Math.random()*160, c = ['#7ef9ff', '#b48cff', '#ffffff', '#4fa3ff'][i % 4]; const lg = g.createLinearGradient(x, 0, x + l, 0); lg.addColorStop(0, 'rgba(0,0,0,0)'); lg.addColorStop(1, c); g.strokeStyle = lg; g.lineWidth = 1 + Math.random()*2; g.beginPath(); g.moveTo(x, y); g.lineTo(x + l, y); g.stroke(); }
+  for (let i = 0; i < 400; i++){ g.fillStyle = 'rgba(255,255,255,' + Math.random() + ')'; g.fillRect(Math.random()*w, Math.random()*h, 2, 2); }
+});
+warpTex.wrapS = THREE.RepeatWrapping; warpTex.repeat.set(2.5, 1);
+const warpMat = new THREE.MeshBasicMaterial({map: warpTex, side: THREE.DoubleSide});
+for (const [x, ry, len, zc] of [[32.12, Math.PI/2, 7.95, 15.0], [33.88, -Math.PI/2, 10.4, 16.2]]){ const m = new THREE.Mesh(new THREE.PlaneGeometry(len, H), warpMat); m.position.set(x, H/2, zc); m.rotation.y = ry; scene.add(m); }
+{ const end = new THREE.Mesh(new THREE.PlaneGeometry(1.8, H), warpMat); end.position.set(33, H/2, 21.48); end.rotation.y = Math.PI; scene.add(end); }
+{ const c = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 10.4), warpMat); c.rotation.x = Math.PI/2; c.rotation.z = Math.PI/2; c.position.set(33, H - .01, 16.2); scene.add(c);
+  const fl = canvasTex(64, 512, (g, w, h) => { g.fillStyle = '#07041a'; g.fillRect(0, 0, w, h); g.fillStyle = '#7ef9ff'; for (let y = 0; y < h; y += 32) g.fillRect(w/2 - 3, y, 6, 16); g.fillStyle = 'rgba(126,249,255,.35)'; g.fillRect(0, 0, 3, h); g.fillRect(w - 3, 0, 3, h); });
+  fl.wrapT = THREE.RepeatWrapping; fl.repeat.set(1, 4);
+  const f = new THREE.Mesh(new THREE.PlaneGeometry(1.86, 10.4), new THREE.MeshBasicMaterial({map: fl})); f.rotation.x = -Math.PI/2; f.position.set(33, .012, 16.2); scene.add(f); warpFloor = fl; }
+const WN = 500, wpos = new Float32Array(WN*3);
+for (let i = 0; i < WN; i++){ wpos[i*3] = 32.15 + Math.random()*1.7; wpos[i*3+1] = .1 + Math.random()*(H - .2); wpos[i*3+2] = 11 + Math.random()*10.4; }
+const wgeo = new THREE.BufferGeometry(); wgeo.setAttribute('position', new THREE.BufferAttribute(wpos, 3));
+const wpts = new THREE.Points(wgeo, new THREE.PointsMaterial({color: 0xbff6ff, size: .018, transparent: true, opacity: .85})); scene.add(wpts);
+function updateWarp(dt){
+  const inW = roomAt(pos.x, pos.z) === 'W';
+  warp += ((inW ? 1 : 0) - warp)*Math.min(1, dt*(inW ? 1.2 : 3));
+  const moving = mode === 'tour' ? (!holding ? 1 : 0) : ((keys.fwd ? 1 : 0) - (keys.back ? 1 : 0));
+  const dir = -Math.cos(pos.yaw) >= 0 ? 1 : -1, flow = (.4 + 9*warp*Math.abs(moving))*dt;
+  warpTex.offset.x += flow*.08*dir; warpFloor.offset.y -= flow*.1*dir;
+  const a = wgeo.attributes.position.array;
+  for (let i = 0; i < WN; i++){ let z = a[i*3+2] - flow*dir*3; if (z < 11) z += 10.4; if (z > 21.4) z -= 10.4; a[i*3+2] = z; }
+  wgeo.attributes.position.needsUpdate = true;
+  const f = baseFov + warp*Math.abs(moving)*18; if (Math.abs(f - lastFov) > .05){ cam.fov = f; cam.updateProjectionMatrix(); lastFov = f; }
+}
+
 /* ---------- applaudir et lancer des roses ---------- */
 let bowT = 0;
 function clap(){
@@ -1416,7 +1449,7 @@ function viewArt(p){
   const d = Math.min(DMAX[p.room] || 3, Math.max(1.5, .8 + Math.max(p.w, p.h)*1.05));
   stops.push({x: p.x + p.nx*d, z: p.z + p.nz*d, yaw: yawTo(-p.nx, -p.nz), pitch: Math.max(-.3, Math.min(.5, Math.atan2(p.cy - EYE, d))), hold: 2.6 + Math.min(2, p.w*.5), art: p.key});
 }
-const LINK = {'E-1': [[8.0, 31], [11, 31]], '1-2': [[15.4, 31], [17.6, 31]], '2-3': [[23.4, 31], [25.6, 31]], '3-4': [[31.4, 31], [33.6, 31]], '4-5': [[43, 29.7], [43, 27.3]], '5-6': [[39, 20.7], [39, 18.3]], '6-7': [[37, 11.7], [37, 9.0]], '7-8': [[35.2, 7.0], [33.75, 8.6], [33.5, 11.6], [33.5, 19.9], [31.6, 19.9]], '8-9': [[12, 19.3], [12, 16.7]], '9-10': [[17, 11.7], [17, 8.0]], '10-11': [[14.0, 5], [10.3, 5]], '11-c': [[6, 8.3], [6, 9.7]], 'c-12': [[6, 14.3], [6, 15.7]], '12-A': [[7.1, 22.3], [7.1, 24.6]], 'A-E': [[4.5, 25.3], [4.5, 28]], 'E-K': [[4.5, 34], [4.5, 37.3]], 'K-P': [[12.3, 38], [14.8, 38]]};
+const LINK = {'E-1': [[8.0, 31], [11, 31]], '1-2': [[15.4, 31], [17.6, 31]], '2-3': [[23.4, 31], [25.6, 31]], '3-4': [[31.4, 31], [33.6, 31]], '4-5': [[43, 29.7], [43, 27.3]], '5-6': [[39, 20.7], [39, 18.3]], '6-7': [[37, 11.7], [37, 9.0]], '7-8': [[35.2, 7.0], [33.75, 8.6], [33, 11.6], [33, 19.9], [31.2, 19.9]], '8-9': [[12, 19.3], [12, 16.7]], '9-10': [[17, 11.7], [17, 8.0]], '10-11': [[14.0, 5], [10.3, 5]], '11-c': [[6, 8.3], [6, 9.7]], 'c-12': [[6, 14.3], [6, 15.7]], '12-A': [[7.1, 22.3], [7.1, 24.6]], 'A-E': [[4.5, 25.3], [4.5, 28]], 'E-K': [[4.5, 34], [4.5, 37.3]], 'K-P': [[12.3, 38], [14.8, 38]]};
 function link(k){ const P = LINK[k]; for (let i = 0; i < P.length; i++){ const a = P[i], b = P[i+1] || [a[0] + (a[0] - P[i-1][0]), a[1] + (a[1] - P[i-1][1])]; way(a[0], a[1], b[0], b[1]); } }
 way(EC.x, EC.z, 10, 31, 1.5);
 const ORDER = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', 'c', '12', 'A'];
@@ -1443,7 +1476,7 @@ function tourStep(dt){
   if (seg >= stops.length - 1){ setCartel({t: 'Fin de la visite', r: 'Merci ! Rejoue la visite ou promène-toi librement.'}); return; }
   if (holding){ holdT += dt; if (holdT >= stops[seg].hold){ holding = false; holdT = 0; } return; }
   const a = stops[seg], b = stops[seg+1], d = reduce ? .001 : segDur(a, b);
-  segT += dt; const t = Math.min(1, segT / d), e = ease(t);
+  segT += dt*(1 + 2*warp); const t = Math.min(1, segT / d), e = ease(t);
   pos.x = a.x + (b.x - a.x)*e; pos.z = a.z + (b.z - a.z)*e; pos.yaw = a.yaw + angDiff(a.yaw, b.yaw)*e; pos.pitch = a.pitch + (b.pitch - a.pitch)*e;
   if (t >= 1){
     seg++; segT = 0; const s = stops[seg];
@@ -1540,7 +1573,8 @@ function freeStep(dt){
   if (keys.left) pos.yaw += dt * 1.4; if (keys.right) pos.yaw -= dt * 1.4;
   if (sitting){ if (keys.fwd || keys.back || keys.jump){ standUp(); keys.jump = false; } else { const a = actionTarget(); if (a !== lastAct){ lastAct = a; $('bAct').hidden = !a; if (a) $('bAct').textContent = a; } return; } }
   const v = (keys.fwd ? 1 : 0) - (keys.back ? 1 : 0);
-  if (v){ pos.x = Math.max(-2, Math.min(46, pos.x - Math.sin(pos.yaw)*v*dt*2.4)); pos.z = Math.max(-2, Math.min(47, pos.z - Math.cos(pos.yaw)*v*dt*2.4)); }
+  const sp = 2.4*(1 + 2.6*warp);
+  if (v){ pos.x = Math.max(-2, Math.min(46, pos.x - Math.sin(pos.yaw)*v*dt*sp)); pos.z = Math.max(-2, Math.min(47, pos.z - Math.cos(pos.yaw)*v*dt*sp)); }
   collide();
   const gnd = groundAt();
   if (keys.jump && pos.y <= gnd + .001) pos.vy = 4.3;
@@ -1565,7 +1599,7 @@ function tick(now){
   const dt = Math.min(.05, (now - last) / 1000); last = now;
   resize();
   if (!quizOpen){ if (mode === 'tour') tourStep(dt); else freeStep(dt); }
-  bowT = Math.max(0, bowT - dt); updateRoses(dt);
+  bowT = Math.max(0, bowT - dt); updateRoses(dt); updateWarp(dt);
   updateGuards(dt); updateVisitors(dt); updateBalls(dt); updatePunch(dt); updateNotes(dt); updateKiosk(); updateAudio();
   if (mode === 'tour' && !drag){ look.idle += dt; if (look.idle > 1.6){ const k = Math.min(1, dt*2.5); look.yaw -= look.yaw*k; look.pitch -= look.pitch*k; } }
   const lt = mode === 'tour';
