@@ -945,6 +945,9 @@ const simon = human({name: 'Simon', skin: skinC, hair: 0x1a1210, pants: lam(0x26
   const ub = new THREE.Mesh(new THREE.CylinderGeometry(.145, .145, .09, 24), wood); ub.rotation.x = Math.PI/2; ub.position.x = .2; gt.add(ub);
   const hole = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, .092, 16), dark); hole.rotation.x = Math.PI/2; hole.position.x = .1; gt.add(hole);
   gt.add(box(.5, .05, .025, dark, .58, 0, .03)); gt.add(box(.14, .07, .025, dark, .88, 0, .03));
+  gt.add(box(.03, .1, .012, dark, -.1, 0, .051));
+  { const steel = new THREE.MeshBasicMaterial({color: 0xe8e4da}); for (let i = 0; i < 6; i++){ const y = -.0175 + i*.007; gt.add(box(1.0, .0022, .0022, steel, .4, y, .059)); }
+    const peg = lam(0xd8c8a0); for (let i = 0; i < 3; i++) for (const sd of [-1, 1]) gt.add(box(.012, .03, .012, peg, .84 + i*.035, sd*.048, .03)); }
   gt.position.set(-.05, 1.12, .26); gt.rotation.z = .25; simon.g.add(gt);
 }
 sitPose(simon, STAGE_Y - .41);
