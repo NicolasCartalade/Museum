@@ -108,7 +108,7 @@ button:focus-visible{outline:2px solid var(--gilt);outline-offset:2px}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const ART = {"falaises": {"src": "img/falaises.jpg", "a": 1.251}, "meragitee": {"src": "img/meragitee.jpg", "a": 1.241}, "trouville": {"src": "img/trouville.jpg", "a": 1.215}, "tilleuls": {"src": "img/tilleuls.jpg", "a": 0.798}, "peupliers": {"src": "img/peupliers.jpg", "a": 0.988}, "grandcanal": {"src": "img/grandcanal.jpg", "a": 1.259}, "bassin": {"src": "img/bassin.jpg", "a": 1.018}, "nympheas": {"src": "img/nympheas.jpg", "a": 1.662}, "ombrelle": {"src": "img/ombrelle.jpg", "a": 0.677}, "irene": {"src": "img/irene.jpg", "a": 0.831}, "durandruel": {"src": "img/durandruel.jpg", "a": 0.798}, "murer": {"src": "img/murer.jpg", "a": 0.832}, "nucouche": {"src": "img/nucouche.jpg", "a": 1.253}, "longchamp": {"src": "img/longchamp.jpg", "a": 1.227}, "terrasse": {"src": "img/terrasse.jpg", "a": 0.802}, "amandier": {"src": "img/amandier.jpg", "a": 1.267}, "iris": {"src": "img/iris.jpg", "a": 1.308}, "cypres": {"src": "img/cypres.jpg", "a": 0.793}, "paysanne": {"src": "img/paysanne.jpg", "a": 0.767}, "breton": {"src": "img/breton.jpg", "a": 1.441}, "iaorana": {"src": "img/iaorana.jpg", "a": 0.776}, "arearea": {"src": "img/arearea.jpg", "a": 1.641}, "victoire": {"src": "img/victoire.jpg", "a": 1.261}, "chaise": {"src": "img/chaise.jpg", "a": 0.78}, "tournesols": {"src": "img/tournesols.jpg", "a": 1.253}, "danse2": {"src": "img/danse2.jpg", "a": 1.452}, "joie": {"src": "img/joie.jpg", "a": 1.376}, "odalisque": {"src": "img/odalisque.jpg", "a": 0.743}, "femmeartiste": {"src": "img/femmeartiste.jpg", "a": 0.656}, "collioure": {"src": "img/collioure.jpg", "a": 1.23}, "derain": {"src": "img/derain.jpg", "a": 1.471}, "chakoska": {"src": "img/chakoska.jpg", "a": 0.551}, "alger": {"src": "img/alger.jpg", "a": 1.659}, "promenade": {"src": "img/promenade.jpg", "a": 0.819}, "montbriand": {"src": "img/montbriand.jpg", "a": 1.235}, "pastorale": {"src": "img/pastorale.jpg", "a": 1.14}, "artilleurs": {"src": "img/artilleurs.jpg", "a": 1.251}, "probleme": {"src": "img/probleme.jpg", "a": 1.629}, "fermeprov": {"src": "img/fermeprov.jpg", "a": 1.326}, "tortoni": {"src": "img/tortoni.jpg", "a": 1.329}, "fenetre": {"src": "img/fenetre.jpg", "a": 0.69}, "femmesalger": {"src": "img/femmesalger.jpg", "a": 1.285}, "moulin": {"src": "img/moulin.jpg", "a": 1.345}, "friedsoleil": {"src": "img/friedsoleil.jpg", "a": 1.389}, "saintadresse": {"src": "img/saintadresse.jpg", "a": 1.376}, "musiciens": {"src": "img/musiciens.jpg", "a": 1.315}, "vague": {"src": "img/vague.jpg", "a": 1.488}, "gonzague": {"src": "img/gonzague.jpg", "a": 0.737}, "botticelli": {"src": "img/botticelli.jpg", "a": 1.024}, "parmigianino": {"src": "img/parmigianino.jpg", "a": 0.426}, "gardeuse": {"src": "img/gardeuse.jpg", "a": 0.475}, "satyres": {"src": "img/satyres.jpg", "a": 0.757}, "giorgione": {"src": "img/giorgione.jpg", "a": 0.893}, "sibylle": {"src": "img/sibylle.jpg", "a": 0.831}, "fontaine": {"src": "img/fontaine.jpg", "a": 0.504}, "ottmann": {"src": "img/ottmann.jpg", "a": 1.304}, "ruines": {"src": "img/ruines.jpg", "a": 1.107}, "communiante": {"src": "img/communiante.jpg", "a": 0.674}, "repine": {"src": "img/repine.jpg", "a": 0.672}, "soirnuages": {"src": "img/soirnuages.jpg", "a": 1.449}, "lippi": {"src": "img/lippi.jpg", "a": 0.694}, "parthenon": {"src": "img/parthenon.jpg", "a": 1.627}, "saintluc": {"src": "img/saintluc.jpg", "a": 0.919}, "fideles": {"src": "img/fideles.jpg", "a": 1.0}, "abricots": {"src": "img/abricots.jpg", "a": 1.62}, "clavecin": {"src": "img/clavecin.jpg", "a": 0.644}, "vieille": {"src": "img/vieille.jpg", "a": 0.655}, "ermita": {"src": "img/ermita.jpg", "a": 1.052}, "daubigny": {"src": "img/daubigny.jpg", "a": 1.627}, "abraham": {"src": "img/abraham.jpg", "a": 1.28}, "rochejaquelein": {"src": "img/rochejaquelein.jpg", "a": 0.639}, "cordoba": {"src": "img/cordoba.jpg", "a": 0.721}, "sanadrian": {"src": "img/sanadrian.jpg", "a": 0.596}, "tobie": {"src": "img/tobie.jpg", "a": 0.49}, "puitsnoir": {"src": "img/puitsnoir.jpg", "a": 1.34}, "pecheurs": {"src": "img/pecheurs.jpg", "a": 1.329}, "adoration": {"src": "img/adoration.jpg", "a": 0.711}, "goodhart": {"src": "img/goodhart.jpg", "a": 0.566}, "grandpere": {"src": "img/grandpere.jpg", "a": 0.755}, "vertueuse": {"src": "img/vertueuse.jpg", "a": 0.743}, "greuze": {"src": "img/greuze.jpg", "a": 0.833}, "mestre": {"src": "img/mestre.jpg", "a": 1.471}, "titien": {"src": "img/titien.jpg", "a": 0.573}, "okazaki": {"src": "img/okazaki.jpg", "a": 1.453}, "messine": {"src": "img/messine.jpg", "a": 1.365}, "portinari": {"src": "img/portinari.jpg", "a": 0.738}, "dansevie": {"src": "img/dansevie.jpg", "a": 1.524}, "apollon": {"src": "img/apollon.jpg", "a": 0.677}, "cantique": {"src": "img/cantique.jpg", "a": 1.07}, "toton": {"src": "img/toton.jpg", "a": 1.145}, "assomption": {"src": "img/assomption.jpg", "a": 0.512}, "falstaff": {"src": "img/falstaff.jpg", "a": 1.251}, "coree": {"src": "img/coree.jpg", "a": 0.483}, "victorienne": {"src": "img/victorienne.jpg", "a": 1.222}, "bainturc": {"src": "img/bainturc.jpg", "a": 0.799}, "drapeaux": {"src": "img/drapeaux.jpg", "a": 1.276}, "automne": {"src": "img/automne.jpg", "a": 0.75}, "eustache": {"src": "img/eustache.jpg", "a": 1.215}, "leversoleil": {"src": "img/leversoleil.jpg", "a": 1.354}, "peche": {"src": "img/peche.jpg", "a": 2.286}, "marcaurele": {"src": "img/marcaurele.jpg", "a": 1.287}, "fayoum": {"src": "img/fayoum.jpg", "a": 0.466}, "arbrevie": {"src": "img/arbrevie.jpg", "a": 0.527}, "lapicque": {"src": "img/lapicque.jpg", "a": 0.871}, "smalah": {"src": "img/smalah.jpg", "a": 4.507}, "balancoire": {"src": "img/balancoire.jpg", "a": 0.783}};
+const ART = {"falaises": {"src": "img/falaises.jpg", "a": 1.251}, "meragitee": {"src": "img/meragitee.jpg", "a": 1.241}, "trouville": {"src": "img/trouville.jpg", "a": 1.215}, "tilleuls": {"src": "img/tilleuls.jpg", "a": 0.798}, "peupliers": {"src": "img/peupliers.jpg", "a": 0.988}, "grandcanal": {"src": "img/grandcanal.jpg", "a": 1.259}, "bassin": {"src": "img/bassin.jpg", "a": 1.018}, "nympheas": {"src": "img/nympheas.jpg", "a": 1.662}, "ombrelle": {"src": "img/ombrelle.jpg", "a": 0.677}, "irene": {"src": "img/irene.jpg", "a": 0.831}, "durandruel": {"src": "img/durandruel.jpg", "a": 0.798}, "murer": {"src": "img/murer.jpg", "a": 0.832}, "nucouche": {"src": "img/nucouche.jpg", "a": 1.253}, "longchamp": {"src": "img/longchamp.jpg", "a": 1.227}, "terrasse": {"src": "img/terrasse.jpg", "a": 0.802}, "amandier": {"src": "img/amandier.jpg", "a": 1.267}, "iris": {"src": "img/iris.jpg", "a": 1.308}, "cypres": {"src": "img/cypres.jpg", "a": 0.793}, "paysanne": {"src": "img/paysanne.jpg", "a": 0.767}, "breton": {"src": "img/breton.jpg", "a": 1.441}, "iaorana": {"src": "img/iaorana.jpg", "a": 0.776}, "arearea": {"src": "img/arearea.jpg", "a": 1.641}, "victoire": {"src": "img/victoire.jpg", "a": 1.261}, "chaise": {"src": "img/chaise.jpg", "a": 0.78}, "tournesols": {"src": "img/tournesols.jpg", "a": 1.253}, "danse2": {"src": "img/danse2.jpg", "a": 1.452}, "joie": {"src": "img/joie.jpg", "a": 1.376}, "odalisque": {"src": "img/odalisque.jpg", "a": 0.743}, "femmeartiste": {"src": "img/femmeartiste.jpg", "a": 0.656}, "collioure": {"src": "img/collioure.jpg", "a": 1.23}, "derain": {"src": "img/derain.jpg", "a": 1.471}, "chakoska": {"src": "img/chakoska.jpg", "a": 0.551}, "alger": {"src": "img/alger.jpg", "a": 1.659}, "promenade": {"src": "img/promenade.jpg", "a": 0.819}, "montbriand": {"src": "img/montbriand.jpg", "a": 1.235}, "pastorale": {"src": "img/pastorale.jpg", "a": 1.14}, "artilleurs": {"src": "img/artilleurs.jpg", "a": 1.251}, "probleme": {"src": "img/probleme.jpg", "a": 1.629}, "fermeprov": {"src": "img/fermeprov.jpg", "a": 1.326}, "tortoni": {"src": "img/tortoni.jpg", "a": 1.329}, "fenetre": {"src": "img/fenetre.jpg", "a": 0.69}, "femmesalger": {"src": "img/femmesalger.jpg", "a": 1.285}, "moulin": {"src": "img/moulin.jpg", "a": 1.345}, "friedsoleil": {"src": "img/friedsoleil.jpg", "a": 1.389}, "saintadresse": {"src": "img/saintadresse.jpg", "a": 1.376}, "musiciens": {"src": "img/musiciens.jpg", "a": 1.315}, "vague": {"src": "img/vague.jpg", "a": 1.488}, "gonzague": {"src": "img/gonzague.jpg", "a": 0.737}, "botticelli": {"src": "img/botticelli.jpg", "a": 1.024}, "parmigianino": {"src": "img/parmigianino.jpg", "a": 0.426}, "gardeuse": {"src": "img/gardeuse.jpg", "a": 0.475}, "satyres": {"src": "img/satyres.jpg", "a": 0.757}, "giorgione": {"src": "img/giorgione.jpg", "a": 0.893}, "sibylle": {"src": "img/sibylle.jpg", "a": 0.831}, "fontaine": {"src": "img/fontaine.jpg", "a": 0.504}, "ottmann": {"src": "img/ottmann.jpg", "a": 1.304}, "ruines": {"src": "img/ruines.jpg", "a": 1.107}, "communiante": {"src": "img/communiante.jpg", "a": 0.674}, "repine": {"src": "img/repine.jpg", "a": 0.672}, "soirnuages": {"src": "img/soirnuages.jpg", "a": 1.449}, "lippi": {"src": "img/lippi.jpg", "a": 0.694}, "parthenon": {"src": "img/parthenon.jpg", "a": 1.627}, "saintluc": {"src": "img/saintluc.jpg", "a": 0.919}, "fideles": {"src": "img/fideles.jpg", "a": 1.0}, "abricots": {"src": "img/abricots.jpg", "a": 1.62}, "clavecin": {"src": "img/clavecin.jpg", "a": 0.644}, "vieille": {"src": "img/vieille.jpg", "a": 0.655}, "ermita": {"src": "img/ermita.jpg", "a": 1.052}, "daubigny": {"src": "img/daubigny.jpg", "a": 1.627}, "abraham": {"src": "img/abraham.jpg", "a": 1.28}, "rochejaquelein": {"src": "img/rochejaquelein.jpg", "a": 0.639}, "cordoba": {"src": "img/cordoba.jpg", "a": 0.721}, "sanadrian": {"src": "img/sanadrian.jpg", "a": 0.596}, "tobie": {"src": "img/tobie.jpg", "a": 0.49}, "puitsnoir": {"src": "img/puitsnoir.jpg", "a": 1.34}, "pecheurs": {"src": "img/pecheurs.jpg", "a": 1.329}, "adoration": {"src": "img/adoration.jpg", "a": 0.711}, "goodhart": {"src": "img/goodhart.jpg", "a": 0.566}, "grandpere": {"src": "img/grandpere.jpg", "a": 0.755}, "vertueuse": {"src": "img/vertueuse.jpg", "a": 0.743}, "greuze": {"src": "img/greuze.jpg", "a": 0.833}, "mestre": {"src": "img/mestre.jpg", "a": 1.471}, "titien": {"src": "img/titien.jpg", "a": 0.573}, "okazaki": {"src": "img/okazaki.jpg", "a": 1.453}, "messine": {"src": "img/messine.jpg", "a": 1.365}, "portinari": {"src": "img/portinari.jpg", "a": 0.738}, "dansevie": {"src": "img/dansevie.jpg", "a": 1.524}, "apollon": {"src": "img/apollon.jpg", "a": 0.677}, "cantique": {"src": "img/cantique.jpg", "a": 1.07}, "toton": {"src": "img/toton.jpg", "a": 1.145}, "assomption": {"src": "img/assomption.jpg", "a": 0.512}, "falstaff": {"src": "img/falstaff.jpg", "a": 1.251}, "coree": {"src": "img/coree.jpg", "a": 0.483}, "victorienne": {"src": "img/victorienne.jpg", "a": 1.222}, "bainturc": {"src": "img/bainturc.jpg", "a": 0.799}, "drapeaux": {"src": "img/drapeaux.jpg", "a": 1.276}, "automne": {"src": "img/automne.jpg", "a": 0.75}, "eustache": {"src": "img/eustache.jpg", "a": 1.215}, "leversoleil": {"src": "img/leversoleil.jpg", "a": 1.354}, "peche": {"src": "img/peche.jpg", "a": 2.286}, "marcaurele": {"src": "img/marcaurele.jpg", "a": 1.287}, "fayoum": {"src": "img/fayoum.jpg", "a": 0.466}, "arbrevie": {"src": "img/arbrevie.jpg", "a": 0.527}, "lapicque": {"src": "img/lapicque.jpg", "a": 0.871}, "smalah": {"src": "img/smalah.jpg", "a": 4.509}, "balancoire": {"src": "img/balancoire.jpg", "a": 0.783}};
 /* Œuvres : clé, titre, artiste, hauteur × largeur en cm, ~ = dimensions approximatives */
 const WORKS = {
  1: [
@@ -444,7 +444,7 @@ const lam = c => new THREE.MeshLambertMaterial({color: c});
 const mats = {
   E: lam(0xe9e2d2), 1: lam(0xd8cbb2), 2: lam(0x2f4a3a), 3: lam(0x9c5a3c), 4: lam(0x1b1b26), 5: lam(0x7a2a28), 6: lam(0x5b5a4a),
   7: lam(0xb9cfd6), 8: lam(0x34505c), 9: lam(0x8a8174), 10: lam(0xeae5dc), 11: lam(0x2a3a5c), c: lam(0x9b8b72), 12: lam(0xb04a2e),
-  A: lam(0xc8c4bc), K: lam(0x3a2433), P: lam(0xdfe6e0), pass: lam(0xa89c88),
+  A: lam(0xc8c4bc), K: lam(0x3a2433), S: lam(0x120c14), P: lam(0xdfe6e0), pass: lam(0xa89c88),
   bench: lam(0x3b2f27), dark: lam(0x2a2420)
 };
 const walls = [], paintGroups = [], segs = [], solids = [], hung = [];
@@ -502,13 +502,17 @@ rectRoom('P', 14, 36.5, 30, 46, {h: 4, doors: {W: [[37.2, 38.8]]}, noHang: true}
 /* Entrée : rotonde */
 const EC = {x: 4.5, z: 31, r: 4}; ROOMH.E = H;
 {
-  const open = [0, -Math.PI/2, Math.PI/2], n = 64;
+  const open = [0, -Math.PI/2, Math.PI/2, Math.PI], n = 64;
   for (let i = 0; i < n; i++){
     const t1 = i/n*2*Math.PI, t2 = (i+1)/n*2*Math.PI, tm = (t1 + t2)/2;
     if (open.some(a => Math.abs(Math.atan2(Math.sin(tm - a), Math.cos(tm - a))) < .23)) continue;
     wall(EC.x + EC.r*Math.cos(t1), EC.z + EC.r*Math.sin(t1), EC.x + EC.r*Math.cos(t2), EC.z + EC.r*Math.sin(t2), mats.E);
   }
 }
+/* Salle secrète (home cinéma) derrière l’accueil */
+rectRoom('S', -9, 26.5, -0.2, 35.5, {h: 3.6, doors: {E: [[30.22, 31.78]]}, noHang: true});
+pair([-0.2, 30.22], [-0.2, 31.78], [0.62, 30.22], [0.62, 31.78]);
+{ const lin = new THREE.Mesh(new THREE.BoxGeometry(.95, H - 2.7, 1.8), mats.E); lin.position.set(.17, 2.7 + (H - 2.7)/2, 31); scene.add(lin); walls.push(lin); }
 /* Salle 10 : ovale 18 × 9 m */
 const CX = 22, CZ = 5, RX = 9, RZ = 4.5; ROOMH[10] = H;
 const E10 = t => [CX + RX*Math.cos(t), CZ + RZ*Math.sin(t)];
@@ -609,7 +613,7 @@ function hangRoom(room, keep){
 hangRoom(10, true);
 
 /* ---------- où suis-je ? ---------- */
-const ROOMS = {W: ['Faille spatiale', 'Couloir de l’hyperespace'], E: ['Entrée', 'Accueil du musée'], 1: ['Salle 1', 'Antiquité et Orient'], 2: ['Salle 2', 'Gothique et première Renaissance'], 3: ['Salle 3', 'Renaissance florentine'], 4: ['Salle 4', 'La Sixtine'], 5: ['Salle 5', 'Venise et maniérisme'], 6: ['Salle 6', 'Le Grand Siècle'], 7: ['Salle 7', 'Lumières et rococo'], 8: ['Salle 8', 'Romantisme et orientalisme'], 9: ['Salle 9', 'Réalisme et symbolisme'], 10: ['Salle 10', 'Impressionnisme'], 11: ['Salle 11', 'Post-impressionnisme'], c: ['Couloir', 'Couloir de l’amitié'], 12: ['Salle 12', 'Fauvisme et modernités'], A: ['Archives', 'Œuvres disparues et archives'], K: ['Salle de concert', 'Nodí tri · Kuatu Kadéra'], P: ['Terrain de sport', 'Le foot du musée'], p: ['Passage', 'Entre deux salles']};
+const ROOMS = {W: ['Faille spatiale', 'Couloir de l’hyperespace'], E: ['Entrée', 'Accueil du musée'], 1: ['Salle 1', 'Antiquité et Orient'], 2: ['Salle 2', 'Gothique et première Renaissance'], 3: ['Salle 3', 'Renaissance florentine'], 4: ['Salle 4', 'La Sixtine'], 5: ['Salle 5', 'Venise et maniérisme'], 6: ['Salle 6', 'Le Grand Siècle'], 7: ['Salle 7', 'Lumières et rococo'], 8: ['Salle 8', 'Romantisme et orientalisme'], 9: ['Salle 9', 'Réalisme et symbolisme'], 10: ['Salle 10', 'Impressionnisme'], 11: ['Salle 11', 'Post-impressionnisme'], c: ['Couloir', 'Couloir de l’amitié'], 12: ['Salle 12', 'Fauvisme et modernités'], A: ['Archives', 'Œuvres disparues et archives'], K: ['Salle de concert', 'Nodí tri · Kuatu Kadéra'], P: ['Terrain de sport', 'Le foot du musée'], S: ['Salle secrète', 'Home cinéma'], p: ['Passage', 'Entre deux salles']};
 function roomAt(x, z){
   if (x > 32.05 && x < 33.95 && z > 9.2 && z < 21.6) return 'W';
   if (((x-CX)/RX)**2 + ((z-CZ)/RZ)**2 < 1) return '10';
@@ -1272,7 +1276,7 @@ function initAudio(){
 function updateAudio(){
   if (!actx) return;
   const d = Math.hypot(pos.x - 6.5, pos.z - 42.5), v = soundOn ? Math.pow(Math.max(0, 1 - d/18), 1.6)*(songState === 'playing' ? 1 : .7) : 0;
-  master.gain.setTargetAtTime(v, actx.currentTime, .25);
+  master.gain.setTargetAtTime(roomAt(pos.x, pos.z) === 'S' ? 0 : v, actx.currentTime, .25);
 }
 addEventListener('pointerdown', initAudio); addEventListener('keydown', initAudio);
 $('bSound').onclick = () => { soundOn = !soundOn; $('bSound').setAttribute('aria-pressed', soundOn); if (soundOn) initAudio(); };
@@ -1392,7 +1396,8 @@ $('qNext').onclick = () => {
     if (win){ validated[qRoom] = true; try { localStorage.setItem('wm-quiz', JSON.stringify(validated)); } catch(e){} }
     const n = refreshScore();
     $('qRoom').textContent = (ROOMS[qRoom] ? ROOMS[qRoom][0] : 'Salle') + ' · résultat';
-    $('qQ').textContent = win ? (n === 12 ? 'Bravo, les 12 salles sont validées !' : 'Salle validée !') : 'Pas encore…';
+    if (win && n === 12) secretUnlocked(true);
+    $('qQ').textContent = win ? (n === 12 ? 'Bravo, les 12 salles sont validées ! Une porte secrète vient de s’ouvrir dans le hall d’entrée…' : 'Salle validée !') : 'Pas encore…';
     $('qOpts').innerHTML = ''; $('qFact').textContent = qScore + '/3 bonnes réponses.' + (win ? ' Salles validées : ' + n + '/12.' : ' Il en faut 2 sur 3 pour valider la salle.');
     $('qNext').textContent = win ? 'Continuer' : 'Rejouer'; return;
   }
@@ -1451,7 +1456,7 @@ function viewArt(p){
 }
 const LINK = {'E-1': [[8.0, 31], [11, 31]], '1-2': [[15.4, 31], [17.6, 31]], '2-3': [[23.4, 31], [25.6, 31]], '3-4': [[31.4, 31], [33.6, 31]], '4-5': [[43, 29.7], [43, 27.3]], '5-6': [[39, 20.7], [39, 18.3]], '6-7': [[37, 11.7], [37, 9.0]], '7-8': [[35.2, 7.0], [33.75, 8.6], [33, 11.6], [33, 19.9], [31.2, 19.9]], '8-9': [[12, 19.3], [12, 16.7]], '9-10': [[17, 11.7], [17, 8.0]], '10-11': [[14.0, 5], [10.3, 5]], '11-c': [[6, 8.3], [6, 9.7]], 'c-12': [[6, 14.3], [6, 15.7]], '12-A': [[7.1, 22.3], [7.1, 24.6]], 'A-E': [[4.5, 25.3], [4.5, 28]], 'E-K': [[4.5, 34], [4.5, 37.3]], 'K-P': [[12.3, 38], [14.8, 38]]};
 function link(k){ const P = LINK[k]; for (let i = 0; i < P.length; i++){ const a = P[i], b = P[i+1] || [a[0] + (a[0] - P[i-1][0]), a[1] + (a[1] - P[i-1][1])]; way(a[0], a[1], b[0], b[1]); } }
-way(EC.x, EC.z, 10, 31, 1.5);
+stops.push({x: EC.x + .6, z: EC.z, yaw: yawTo(-1, 0), pitch: .3, hold: 3.2}); way(EC.x, EC.z, 10, 31, .3);
 const ORDER = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', 'c', '12', 'A'];
 let prev = 'E';
 for (const r of ORDER){
@@ -1466,7 +1471,7 @@ link('K-P');
 way(22, 38.6, 22, 41.25, 6);
 stops.push({x: 22, z: 38.4, yaw: yawTo(0, 1), pitch: 0, hold: 4, end: true});
 
-let seg = 0, segT = 0, holdT = 0, holding = false;
+let seg = 0, segT = 0, holdT = 0, holding = true;
 const ease = t => t < .5 ? 2*t*t : 1 - (-2*t + 2)**2 / 2;
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 function segDur(a, b){ return Math.max(.9, Math.hypot(b.x-a.x, b.z-a.z) / 1.6, Math.abs(angDiff(a.yaw, b.yaw)) / 1.2); }
@@ -1574,7 +1579,7 @@ function freeStep(dt){
   if (sitting){ if (keys.fwd || keys.back || keys.jump){ standUp(); keys.jump = false; } else { const a = actionTarget(); if (a !== lastAct){ lastAct = a; $('bAct').hidden = !a; if (a) $('bAct').textContent = a; } return; } }
   const v = (keys.fwd ? 1 : 0) - (keys.back ? 1 : 0);
   const sp = 2.4*(1 + 2.6*warp);
-  if (v){ pos.x = Math.max(-2, Math.min(46, pos.x - Math.sin(pos.yaw)*v*dt*sp)); pos.z = Math.max(-2, Math.min(47, pos.z - Math.cos(pos.yaw)*v*dt*sp)); }
+  if (v){ pos.x = Math.max(-9.5, Math.min(46, pos.x - Math.sin(pos.yaw)*v*dt*sp)); pos.z = Math.max(-2, Math.min(47, pos.z - Math.cos(pos.yaw)*v*dt*sp)); }
   collide();
   const gnd = groundAt();
   if (keys.jump && pos.y <= gnd + .001) pos.vy = 4.3;
@@ -1594,13 +1599,159 @@ $('bFree').onclick = () => setMode('free');
 $('bSkip').onclick = skip;
 setTimeout(() => { if (mode === 'tour' && seg < 2) setCartel(null); }, 5000);
 
+/* ---------- hall : inscription WikiMuseum ---------- */
+{
+  const back = new THREE.Mesh(new THREE.BoxGeometry(.3, 1.15, 3.0), lam(0x1d1914)); back.position.set(.8, 3.42, 31); scene.add(back);
+  const tex = canvasTex(1536, 576, (g, w, h) => {
+    g.fillStyle = '#16120e'; g.fillRect(0, 0, w, h);
+    g.strokeStyle = '#c9a54a'; g.lineWidth = 10; g.strokeRect(22, 22, w - 44, h - 44); g.lineWidth = 3; g.strokeRect(44, 44, w - 88, h - 88);
+    const gr = g.createLinearGradient(0, 120, 0, 330); gr.addColorStop(0, '#f6e3a1'); gr.addColorStop(.55, '#d4ae4f'); gr.addColorStop(1, '#a27a26');
+    g.fillStyle = gr; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = '600 196px Georgia, "Times New Roman", serif'; g.fillText('WikiMuseum', w/2, 238);
+    g.fillStyle = '#e8d7a6'; g.font = 'italic 64px Georgia, "Times New Roman", serif'; g.fillText('by Cartalade Nicolas and Claudio', w/2, 418);
+    g.fillStyle = '#c9a54a'; g.fillRect(w/2 - 260, 338, 520, 3);
+  });
+  const p = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 1.125), new THREE.MeshBasicMaterial({map: tex})); p.position.set(.956, 3.42, 31); p.rotation.y = Math.PI/2; scene.add(p);
+}
+
+/* ---------- sens de visite au sol ---------- */
+{
+  const tex = canvasTex(128, 128, (g, w, h) => {
+    g.strokeStyle = 'rgba(201,165,74,.95)'; g.lineWidth = 17; g.lineCap = 'round'; g.lineJoin = 'round';
+    for (const y of [44, 84]){ g.beginPath(); g.moveTo(26, y + 22); g.lineTo(64, y - 14); g.lineTo(102, y + 22); g.stroke(); }
+  });
+  const mat = new THREE.MeshBasicMaterial({map: tex, transparent: true, opacity: .8, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2});
+  const MAIN = [[6.2, 31], [11, 31], [15.4, 31], [17.6, 31], [23.4, 31], [25.6, 31], [31.4, 31], [33.6, 31], [43, 31], [43, 27.3], [39, 20.7], [39, 18.3], [37, 11.7], [37, 9.0], [35.2, 7.0], [33.75, 8.6], [33, 11.6], [33, 19.9], [31.2, 19.9], [28, 22.25], [15.5, 22.25], [12, 19.3], [12, 16.7], [17, 11.7], [17, 8.0], [14, 5], [10.3, 5], [6, 8.3], [6, 9.7], [6, 14.3], [6, 15.7], [7.1, 22.3], [7.1, 24.6], [4.5, 25.3], [4.5, 28], [2.7, 31], [4.5, 34], [4.5, 37.3], [12.3, 38], [14.8, 38]];
+  const BACK = [[14.8, 38], [12.3, 38], [5.2, 37.4], [4.5, 34.4], [6.3, 32.4], [7.4, 31.3]];
+  const pts = [];
+  for (const P of [MAIN, BACK]){
+    let carry = .9;
+    for (let i = 0; i < P.length - 1; i++){
+      const [ax, az] = P[i], [bx, bz] = P[i+1], L = Math.hypot(bx - ax, bz - az), dx = (bx - ax)/L, dz = (bz - az)/L;
+      for (let s = carry; s < L; s += 2.1){ pts.push([ax + dx*s - dz*.35, az + dz*s + dx*.35, Math.atan2(-dx, -dz)]); carry = s + 2.1 - L; }
+      if (carry > L) carry -= L;
+    }
+  }
+  const im = new THREE.InstancedMesh(new THREE.PlaneGeometry(.5, .5), mat, pts.length), q = new THREE.Quaternion(), flat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI/2), m4 = new THREE.Matrix4(), one = new THREE.Vector3(1, 1, 1);
+  pts.forEach(([x, z, a], i) => { q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), a).multiply(flat); m4.compose(new THREE.Vector3(x, .016, z), q, one); im.setMatrixAt(i, m4); });
+  scene.add(im);
+}
+
+/* ---------- salle secrète : home cinéma ---------- */
+const DOOR = {x: .45, z: 31, w: 1.58};
+const doorMesh = new THREE.Mesh(new THREE.BoxGeometry(.12, 2.7, DOOR.w), mats.E); doorMesh.position.set(DOOR.x, 1.35, DOOR.z); scene.add(doorMesh); walls.push(doorMesh);
+const doorSeg = [DOOR.x, DOOR.z - DOOR.w/2, DOOR.x, DOOR.z + DOOR.w/2]; segs.push(doorSeg);
+const doorTrim = new THREE.Group(); doorTrim.visible = false; scene.add(doorTrim);
+{ const gold = new THREE.MeshBasicMaterial({color: 0xd4ae4f}); for (const z of [DOOR.z - DOOR.w/2 - .03, DOOR.z + DOOR.w/2 + .03]) at(doorTrim, new THREE.Mesh(new THREE.BoxGeometry(.04, 2.76, .05), gold), .63, 1.38, z); at(doorTrim, new THREE.Mesh(new THREE.BoxGeometry(.04, .05, DOOR.w + .12), gold), .66, 2.74, DOOR.z); }
+let unlocked = false, doorOpen = 0, doorHinted = false, secretSeen = false;
+function allQuizDone(){ return Object.keys(QUIZ).every(r => validated[r]); }
+function secretUnlocked(announce){
+  if (unlocked) return; unlocked = true; doorTrim.visible = true;
+  if (announce) setTimeout(() => say('Salle secrète débloquée !', 'Une porte vient de s’ouvrir dans le mur de l’accueil, derrière le point de départ.', 5000), 400);
+}
+if (allQuizDone()) secretUnlocked(false);
+{
+  const room = new THREE.Group(); scene.add(room);
+  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(8.8, 9), lam(0x0a070c)); ceil.rotation.x = Math.PI/2; ceil.position.set(-4.6, 3.59, 31); room.add(ceil);
+  const stars = new THREE.BufferGeometry(), sp = [];
+  for (let i = 0; i < 260; i++) sp.push(-8.9 + Math.random()*8.6, 3.575, 26.6 + Math.random()*8.8);
+  stars.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
+  room.add(new THREE.Points(stars, new THREE.PointsMaterial({color: 0xfff1c8, size: .035})));
+  const carpet = new THREE.Mesh(new THREE.PlaneGeometry(8.8, 9), lam(0x26080d)); carpet.rotation.x = -Math.PI/2; carpet.position.set(-4.6, .012, 31); room.add(carpet);
+  const warm = new THREE.MeshBasicMaterial({color: 0xffc977});
+  for (const x of [-7.4, -5.2, -3.0, -1.0]) for (const z of [26.62, 35.38]) at(room, new THREE.Mesh(new THREE.BoxGeometry(.28, .12, .06), warm), x, 2.2, z);
+  const lamp = new THREE.PointLight(0xffb070, .5, 9); lamp.position.set(-4.6, 3.1, 31); room.add(lamp);
+  // estrade, cadre et rideaux
+  at(room, new THREE.Mesh(new THREE.BoxGeometry(.7, .25, 7.4), lam(0x1a1216)), -8.65, .125, 31); solid(-8.65, 31, .35, 3.7, 0, .25);
+  at(room, new THREE.Mesh(new THREE.BoxGeometry(.08, 3.0, 5.1), new THREE.MeshLambertMaterial({color: 0x050505})), -8.86, 2.2, 31);
+  const velvet = canvasTex(256, 256, (g, w, h) => { for (let x = 0; x < w; x++){ const v = 90 + 60*Math.sin(x/w*Math.PI*10); g.fillStyle = 'rgb(' + v + ',' + (v*.12|0) + ',' + (v*.18|0) + ')'; g.fillRect(x, 0, 1, h); } });
+  for (const z of [27.6, 34.4]) at(room, new THREE.Mesh(new THREE.BoxGeometry(.18, 3.4, 1.6), new THREE.MeshLambertMaterial({map: velvet})), -8.8, 1.9, z);
+  // fauteuils
+  const red = lam(0x52070f), dark = lam(0x22050a);
+  function armchair(){
+    const c = new THREE.Group();
+    at(c, new THREE.Mesh(new THREE.BoxGeometry(.6, .42, .58), red), 0, .21, .02);
+    at(c, new THREE.Mesh(new THREE.BoxGeometry(.62, .62, .14), red), 0, .62, -.25);
+    for (const x of [-.32, .32]) at(c, new THREE.Mesh(new THREE.BoxGeometry(.08, .6, .6), dark), x, .3, 0);
+    return c;
+  }
+  for (const x of [-5.4, -4.1, -2.8]) for (const z of [29.1, 29.9, 32.1, 32.9]){
+    const c = armchair(); c.position.set(x, 0, z); c.rotation.y = -Math.PI/2; room.add(c);
+    solid(x, z, .32, .34, 0, .47); SEATS.push({kind: 'chair', x, z, face: Math.PI/2, top: .47});
+  }
+  // machine à pop-corn
+  const pc = new THREE.Group(); pc.position.set(-1.0, 0, 27.2); room.add(pc);
+  at(pc, new THREE.Mesh(new THREE.BoxGeometry(.6, .8, .5), lam(0xb3202a)), 0, .4, 0);
+  at(pc, new THREE.Mesh(new THREE.BoxGeometry(.56, .55, .46), new THREE.MeshLambertMaterial({color: 0xfff1b0, transparent: true, opacity: .55})), 0, 1.08, 0);
+  at(pc, new THREE.Mesh(new THREE.BoxGeometry(.62, .12, .52), lam(0xb3202a)), 0, 1.41, 0);
+  solid(-1.0, 27.2, .32, .27, 0, 1.47);
+}
+/* écran : diaporama (à remplir plus tard dans SLIDES, ex. 'slides/01.jpg') */
+const SLIDES = [];
+const screenMat = new THREE.MeshBasicMaterial({map: canvasTex(1280, 720, (g, w, h) => {
+  const gr = g.createRadialGradient(w/2, h/2, 40, w/2, h/2, w*.7); gr.addColorStop(0, '#1d2236'); gr.addColorStop(1, '#05060c'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillStyle = '#d4ae4f'; g.font = '600 120px Georgia, serif'; g.fillText('WikiMuseum', w/2, h/2 - 110);
+  g.fillStyle = '#efe6cf'; g.font = 'italic 54px Georgia, serif'; g.fillText('Diaporama à venir…', w/2, h/2 + 20);
+  g.fillStyle = '#9aa0b8'; g.font = '34px Georgia, serif'; g.fillText('Bravo : tu as validé les 12 salles du musée.', w/2, h/2 + 120);
+})});
+const screen = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 2.7), screenMat); screen.position.set(-8.81, 2.2, 31); screen.rotation.y = Math.PI/2; scene.add(screen);
+const slideTex = []; let slideI = 0, slideT = 0;
+SLIDES.forEach((src, i) => new THREE.TextureLoader().load(src, t => { t.encoding = THREE.sRGBEncoding; slideTex[i] = t; }));
+
+function updateSecret(dt){
+  const inS = roomAt(pos.x, pos.z) === 'S';
+  const dDoor = Math.hypot(pos.x - DOOR.x, pos.z - DOOR.z);
+  const want = unlocked && dDoor < 1.9 && !quizOpen ? 1 : 0;
+  doorOpen += Math.max(-dt*1.1, Math.min(dt*1.1, want - doorOpen));
+  doorMesh.position.z = DOOR.z - doorOpen*(DOOR.w + .04);
+  const idx = segs.indexOf(doorSeg);
+  if (doorOpen < .55 && idx < 0) segs.push(doorSeg); else if (doorOpen >= .55 && idx >= 0) segs.splice(idx, 1);
+  if (!unlocked && mode === 'free' && dDoor < 1.5){ if (!doorHinted){ doorHinted = true; say('Un mur étrange…', 'Ce mur sonne creux. Valide les quiz des 12 salles pour découvrir ce qu’il cache.', 3800); } }
+  else if (dDoor > 2.5) doorHinted = false;
+  if (inS && !secretSeen){ secretSeen = true; say('Salle secrète', 'Bienvenue dans le home cinéma. Installe-toi dans un fauteuil et écoute les oiseaux…', 4500); }
+  if (slideTex.length && inS){ slideT += dt; if (slideT > 7 || !screenMat.userData.started){ slideT = 0; screenMat.userData.started = true; for (let k = 0; k < SLIDES.length; k++){ slideI = (slideI + 1) % SLIDES.length; if (slideTex[slideI]) break; } if (slideTex[slideI]){ screenMat.map = slideTex[slideI]; screenMat.needsUpdate = true; } } }
+}
+
+/* chants d’oiseaux (synthèse) + petit ruisseau */
+let birdBus = null, nextBird = 0, brook = null;
+function chirp(t, f0, f1, dur, vol, pan){
+  const o = actx.createOscillator(), g = actx.createGain(); o.type = 'sine';
+  o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + Math.min(.02, dur/3)); g.gain.setTargetAtTime(0, t + dur*.6, dur*.25);
+  let out = g; if (actx.createStereoPanner){ const p = actx.createStereoPanner(); p.pan.value = pan; g.connect(p); out = p; }
+  o.connect(g); out.connect(birdBus); o.start(t); o.stop(t + dur + .3);
+}
+function birdPhrase(t){
+  const pan = Math.random()*1.6 - .8, r = Math.random(), R = (a, b) => a + Math.random()*(b - a);
+  if (r < .3){ const b = R(2400, 3000); chirp(t, b, b*1.3, .18, .07, pan); chirp(t + .26, b*1.3, b*.95, .26, .07, pan); return .7; }
+  if (r < .55){ const n = 6 + (Math.random()*7|0), f = R(3900, 4700); for (let i = 0; i < n; i++) chirp(t + i*.065, f*1.08, f*.92, .05, .045, pan); return n*.065 + .2; }
+  if (r < .85){ let tt = t; const n = 4 + (Math.random()*4|0); for (let i = 0; i < n; i++){ const d = R(.07, .15), f = R(2100, 4400); chirp(tt, f, f*R(.8, 1.25), d, .05, pan); tt += d + R(.04, .1); } return tt - t + .2; }
+  for (let i = 0; i < 2; i++){ chirp(t + i*.75, 640, 540, .38, .05, pan*.5); chirp(t + i*.75 + .42, 560, 500, .22, .035, pan*.5); } return 1.6;
+}
+function updateBirds(){
+  if (!actx) return;
+  if (!birdBus){
+    birdBus = actx.createGain(); birdBus.gain.value = 0; birdBus.connect(actx.destination);
+    const len = actx.sampleRate*3, buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0); let b = 0;
+    for (let i = 0; i < len; i++){ b = .97*b + .03*(Math.random()*2 - 1); d[i] = b*3; }
+    brook = actx.createBufferSource(); brook.buffer = buf; brook.loop = true;
+    const f = actx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 700; f.Q.value = .6;
+    const g = actx.createGain(); g.gain.value = .12; brook.connect(f); f.connect(g); g.connect(birdBus); brook.start();
+    nextBird = actx.currentTime + .5;
+  }
+  const on = soundOn && roomAt(pos.x, pos.z) === 'S';
+  birdBus.gain.setTargetAtTime(on ? 1 : 0, actx.currentTime, .6);
+  if (on && actx.currentTime > nextBird - .1){ const t = Math.max(actx.currentTime + .05, nextBird); nextBird = t + birdPhrase(t) + .4 + Math.random()*2.2; }
+}
+
 let last = performance.now();
 function tick(now){
   const dt = Math.min(.05, (now - last) / 1000); last = now;
   resize();
   if (!quizOpen){ if (mode === 'tour') tourStep(dt); else freeStep(dt); }
   bowT = Math.max(0, bowT - dt); updateRoses(dt); updateWarp(dt);
-  updateGuards(dt); updateVisitors(dt); updateBalls(dt); updatePunch(dt); updateNotes(dt); updateKiosk(); updateAudio();
+  updateGuards(dt); updateVisitors(dt); updateBalls(dt); updatePunch(dt); updateNotes(dt); updateKiosk(); updateAudio(); updateSecret(dt); updateBirds();
   if (mode === 'tour' && !drag){ look.idle += dt; if (look.idle > 1.6){ const k = Math.min(1, dt*2.5); look.yaw -= look.yaw*k; look.pitch -= look.pitch*k; } }
   const lt = mode === 'tour';
   cam.position.set(pos.x, EYE + pos.y, pos.z); cam.rotation.set(pos.pitch + (lt ? look.pitch : 0), pos.yaw + (lt ? look.yaw : 0), 0);
