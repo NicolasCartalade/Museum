@@ -591,7 +591,8 @@ function hangRoom(room, keep){
   }
   for (const sg of S){
     if (!sg.items.length) continue;
-    sg.items.sort((p, q) => list.indexOf(p) - list.indexOf(q));
+    if (keep) sg.items.sort((p, q) => list.indexOf(p) - list.indexOf(q));
+    else { const by = sg.items.slice().sort((p, q) => q.w*q.h - p.w*p.h), arr = []; by.forEach((a, i) => i % 2 ? arr.unshift(a) : arr.push(a)); sg.items = arr; }
     const tot = sg.items.reduce((t, a) => t + a.w/100*(a.scale || 1), 0), gap = (sg.s.len - tot)/(sg.items.length + 1);
     let s = gap;
     for (const a of sg.items){ const w = a.w/100*(a.scale || 1), p = sg.s.at(s + w/2); hangWork(a, p.x, p.z, p.nx, p.nz, room); s += w + gap; }
@@ -613,7 +614,8 @@ function roomAt(x, z){
 /* ---------- mobilier ---------- */
 function at(parent, mesh, x, y, z){ mesh.position.set(x || 0, y || 0, z || 0); parent.add(mesh); return mesh; }
 const box = (w, h, d, mat, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); return m; };
-function bench(x, z, len, yaw){ const b = box(len, .45, .6, mats.bench, x, .225, z); b.rotation.y = yaw || 0; scene.add(b); solid(x, z, len/2, .3, yaw || 0, .45); }
+const SEATS = [];
+function bench(x, z, len, yaw){ SEATS.push({kind: 'bench', x, z, len, yaw: yaw || 0, top: .45}); const b = box(len, .45, .6, mats.bench, x, .225, z); b.rotation.y = yaw || 0; scene.add(b); solid(x, z, len/2, .3, yaw || 0, .45); }
 bench(CX, CZ, 3.4); bench(4.5, 19.6, 2.6); bench(15, 18.5, 2.6, Math.PI/2); bench(39, 24, 2.6); bench(28.5, 33.4, 2.4);
 
 /* Bornes de quiz, à la sortie de chaque salle */
@@ -693,7 +695,7 @@ function chair(){
   c.add(box(.46, .42, .04, gm.chair, 0, .7, -.21));
   return c;
 }
-for (const z of [38.9, 40.1]) for (const x of [3, 4.6, 6.2, 7.8, 9.4]){ const c = chair(); c.position.set(x, 0, z); scene.add(c); solid(x, z, .24, .24, 0, .47); }
+for (const z of [38.9, 40.1]) for (const x of [3, 4.6, 6.2, 7.8, 9.4]){ const c = chair(); c.position.set(x, 0, z); scene.add(c); solid(x, z, .24, .24, 0, .47); SEATS.push({kind: 'chair', x, z, face: Math.PI, top: .47}); }
 const piano = new THREE.Group();
 {
   const black = new THREE.MeshPhongMaterial({color: 0x0b0b0c, specular: 0x555555, shininess: 90});
@@ -913,8 +915,8 @@ place(mathys, PB.x, 0, PB.z + .78, Math.PI, 'box');
 const STAGE_Y = .35;
 const simon = human({name: 'Simon', skin: skinC, hair: 0x1a1210, pants: lam(0x26324a), sleeve: lam(0xe8dcc0), torso: shirtMats(0xe8dcc0)});
 {
-  const stool = new THREE.Group(); at(stool, new THREE.Mesh(new THREE.CylinderGeometry(.18, .18, .05, 16), lam(0x6b4a2a)), 0, .62, 0);
-  for (let i = 0; i < 3; i++){ const a = i*2.09; stool.add(box(.03, .62, .03, lam(0x3a2a1a), Math.cos(a)*.12, .31, Math.sin(a)*.12)); }
+  const stool = new THREE.Group(); at(stool, new THREE.Mesh(new THREE.CylinderGeometry(.18, .18, .05, 16), lam(0x6b4a2a)), 0, .44, 0);
+  for (let i = 0; i < 3; i++){ const a = i*2.09; stool.add(box(.03, .44, .03, lam(0x3a2a1a), Math.cos(a)*.12, .22, Math.sin(a)*.12)); }
   stool.position.set(5.2, STAGE_Y, 43.05); scene.add(stool);
   const wood = lam(0xa0622d), dark = lam(0x2a1a10);
   const gt = new THREE.Group();
@@ -922,10 +924,10 @@ const simon = human({name: 'Simon', skin: skinC, hair: 0x1a1210, pants: lam(0x26
   const ub = new THREE.Mesh(new THREE.CylinderGeometry(.145, .145, .09, 24), wood); ub.rotation.x = Math.PI/2; ub.position.x = .2; gt.add(ub);
   const hole = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, .092, 16), dark); hole.rotation.x = Math.PI/2; hole.position.x = .1; gt.add(hole);
   gt.add(box(.5, .05, .025, dark, .58, 0, .03)); gt.add(box(.14, .07, .025, dark, .88, 0, .03));
-  gt.position.set(-.05, 1.08, .24); gt.rotation.z = .25; simon.g.add(gt);
+  gt.position.set(-.05, 1.12, .26); gt.rotation.z = .25; simon.g.add(gt);
 }
-sitPose(simon, STAGE_Y + .1);
-const vSimon = place(simon, 5.2, STAGE_Y + .1, 43.05, Math.PI, 'guitar');
+sitPose(simon, STAGE_Y - .41);
+const vSimon = place(simon, 5.2, STAGE_Y - .41, 43.05, Math.PI, 'guitar');
 const safir = human({name: 'Safir', skin: skinC, hair: 0x1a1210, pants: lam(0x1b1b1f), sleeve: lam(0xc8102e),
   torso: shirtMats(0xc8102e, (g, w, h) => { g.fillStyle = '#f6c700'; g.fillRect(w*.38, 0, w*.24, h); g.beginPath(); g.arc(w*.25, h*.25, 16, 0, 7); g.fill(); }, backName('SAFIR', '9', '#f6c700'))});
 {
@@ -935,20 +937,20 @@ const safir = human({name: 'Safir', skin: skinC, hair: 0x1a1210, pants: lam(0x1b
   const f = new THREE.Mesh(new THREE.PlaneGeometry(.29, .47), new THREE.MeshLambertMaterial({map: front})); f.position.set(0, .24, -.152); f.rotation.y = Math.PI; cj.add(f);
   cj.position.set(3.2, STAGE_Y, 43.15); scene.add(cj);
 }
-sitPose(safir, STAGE_Y - .03); safir.arms.forEach(a => a.rotation.x = -1.08);
-const vSafir = place(safir, 9.9 - .62, STAGE_Y - .03, 42.6, Math.PI/2, 'piano');
+sitPose(safir, STAGE_Y - .37); safir.arms.forEach(a => a.rotation.x = -1.08);
+const vSafir = place(safir, 9.9 - .62, STAGE_Y - .37, 42.6, Math.PI/2, 'piano');
 {
   const st = new THREE.Group(), metal = lam(0x222222);
   at(st, new THREE.Mesh(new THREE.CylinderGeometry(.16, .18, .03, 16), metal), 0, .015, 0);
-  at(st, new THREE.Mesh(new THREE.CylinderGeometry(.012, .012, 1.5, 8), metal), 0, .75, 0);
-  const mic = new THREE.Group(); mic.position.y = 1.5; mic.rotation.x = .5;
+  at(st, new THREE.Mesh(new THREE.CylinderGeometry(.012, .012, 1.12, 8), metal), 0, .56, 0);
+  const mic = new THREE.Group(); mic.position.y = 1.12; mic.rotation.x = .9;
   at(mic, new THREE.Mesh(new THREE.CylinderGeometry(.018, .012, .16, 10), metal), 0, .08, 0);
   at(mic, new THREE.Mesh(new THREE.SphereGeometry(.03, 12, 10), lam(0x777777)), 0, .18, 0);
   st.add(mic); st.position.set(3.5, STAGE_Y, 42.62); st.rotation.y = Math.atan2(-.3, .53); scene.add(st);
 }
 const nico = human({name: 'Nico', skin: skinB, hair: 0x5a3a22, pants: lam(0x2e4a72), sleeve: lam(0xf7f7f7), torso: shirtMats(0xf7f7f7, olFront, backName('NICO', '8', '#14307a'))});
-sitPose(nico, STAGE_Y - .04);
-const vNico = place(nico, 3.2, STAGE_Y - .04, 43.15, Math.PI, 'nico', {state: 'sing', timer: 120, path: null, pi: 0, phase: 0, cool: 0, kick: 0, home: [18.5, 41.25]});
+sitPose(nico, STAGE_Y - .39);
+const vNico = place(nico, 3.2, STAGE_Y - .39, 43.15, Math.PI, 'nico', {state: 'sing', timer: 120, path: null, pi: 0, phase: 0, cool: 0, kick: 0, home: [18.5, 41.25]});
 const mathias = human({name: 'Mathias', skin: skinA, hair: 0x3b2a1e, pants: lam(0x14307a), sleeve: lam(0xf7f7f7), torso: shirtMats(0xf7f7f7, olFront, backName('MATHIAS', '6', '#14307a'))});
 const vMathias = place(mathias, 25.5, 0, 41.25, -Math.PI/2, 'mathias', {phase: 0, cool: 0, kick: 0, home: [25.5, 41.25]});
 
@@ -963,7 +965,7 @@ function updateNotes(dt){
 /* ---------- interface ---------- */
 const $ = id => document.getElementById(id);
 let shownRoom = null;
-function setRoom(r){ if (r === shownRoom) return; shownRoom = r; const n = ROOMS[r] || ROOMS.p; $('roomNo').textContent = n[0]; $('roomName').textContent = n[1]; }
+function setRoom(r){ if (r === shownRoom) return; shownRoom = r; if (r === 'K') say('En concert', '« Morning Mornaight »' + (actx ? '' : ' · touche l’écran pour lancer le son'), 3500); const n = ROOMS[r] || ROOMS.p; $('roomNo').textContent = n[0]; $('roomName').textContent = n[1]; }
 function setCartel(a){ const c = $('cartel'); if (!a){ c.setAttribute('data-off', ''); return; } c.removeAttribute('data-off'); $('cT').textContent = a.t; $('cA').textContent = a.r; }
 let sayTimer = null;
 function say(t, r, ms){ setCartel({t, r}); clearTimeout(sayTimer); sayTimer = setTimeout(() => setCartel(null), ms || 2400); }
@@ -1026,15 +1028,33 @@ function ballSub(dt){
     if (d < .5 && pos.y < .4){ const fx = -Math.sin(pos.yaw), fz = -Math.cos(pos.yaw); kickBall(football, dx/d*.4 + fx, dz/d*.4 + fz, Math.max(2.6, Math.hypot(football.vx, football.vz)), .3); }
   }
 }
+let sitting = null;
+function seatSpot(s){
+  if (s.kind === 'chair') return {x: s.x, z: s.z, face: s.face, top: s.top};
+  const ax = Math.cos(s.yaw), az = -Math.sin(s.yaw), t = Math.max(-(s.len/2 - .3), Math.min(s.len/2 - .3, (pos.x - s.x)*ax + (pos.z - s.z)*az));
+  const x = s.x + ax*t, z = s.z + az*t, nx = -az, nz = ax, side = (pos.x - x)*nx + (pos.z - z)*nz >= 0 ? 1 : -1;
+  return {x, z, face: Math.atan2(-nx*side, -nz*side), top: s.top};
+}
+function nearSeat(){
+  let best = null, bd = 1.15;
+  for (const s of SEATS){ const p = seatSpot(s), d = Math.hypot(p.x - pos.x, p.z - pos.z); if (d < bd && !visitors.some(v => Math.hypot(v.p.g.position.x - p.x, v.p.g.position.z - p.z) < .55)){ bd = d; best = p; } }
+  return best;
+}
+function sitDown(p){ sitting = p; Object.assign(pos, {x: p.x, z: p.z, yaw: p.face, y: p.top - .78, vy: 0, pitch: 0}); keys.fwd = keys.back = keys.jump = false; say('Assis', 'Avance ou appuie sur « Se lever » pour te relever.', 2200); }
+function standUp(){ if (!sitting) return; const fx = -Math.sin(pos.yaw), fz = -Math.cos(pos.yaw); pos.x += fx*.6; pos.z += fz*.6; pos.y = 0; pos.vy = 0; sitting = null; }
 function actionTarget(){
   if (mode !== 'free') return null;
+  if (sitting) return 'Se lever';
   const c = [['Tirer', Math.hypot(football.x - pos.x, football.z - pos.z), 2.2], ['Lancer', Math.hypot(basket.x - pos.x, basket.z - pos.z), 1.8], ['Frapper', Math.hypot(PB.x - pos.x, PB.z - pos.z), 1.8]].filter(a => a[1] < a[2]).sort((a, b) => a[1] - b[1]);
-  return c.length ? c[0][0] : null;
+  if (c.length) return c[0][0];
+  return nearSeat() ? 'S’asseoir' : null;
 }
 function doAction(){
   if (mode !== 'free') setMode('free');
   const a = actionTarget(), fx = -Math.sin(pos.yaw), fz = -Math.cos(pos.yaw);
-  if (a === 'Tirer') kickBall(football, fx, fz, 10.5, Math.max(1.5, Math.min(7, 2.5 + pos.pitch*8)));
+  if (a === 'Se lever') standUp();
+  else if (a === 'S’asseoir') sitDown(nearSeat());
+  else if (a === 'Tirer') kickBall(football, fx, fz, 10.5, Math.max(1.5, Math.min(7, 2.5 + pos.pitch*8)));
   else if (a === 'Frapper'){ hitPunch(PB.x - pos.x, PB.z - pos.z, 3.4); say('Punching-ball', 'Bien frappé !', 1200); }
   else if (a === 'Lancer'){
     const sx = pos.x + fx*.35, sy = 1.95 + pos.y, sz = pos.z + fz*.35, hx = HOOP.x - sx, hz = HOOP.z - sz, dh = Math.hypot(hx, hz);
@@ -1115,8 +1135,9 @@ function updateVisitors(dt){
       p.legs[0].thigh.rotation.x = -.15; p.legs[1].thigh.rotation.x = .15;
     }
     if (v.kind === 'guitar'){
-      p.arms[0].rotation.x = -.95 + Math.sin(v.t*9)*.12; p.arms[0].rotation.z = .35;
-      p.arms[1].rotation.x = -1.25; p.arms[1].rotation.z = -.95; p.head.rotation.x = .12 + Math.sin(v.t*2.2)*.05;
+      const strum = Math.sin(v.t*7.5);
+      p.arms[0].rotation.x = -.62 + strum*.1; p.arms[0].rotation.z = .55 + strum*.05; p.arms[0].rotation.y = 0;
+      p.arms[1].rotation.x = -1.02 + Math.sin(v.t*1.6)*.05; p.arms[1].rotation.z = .62 + Math.sin(v.t*1.6)*.04; p.head.rotation.x = .18 + Math.sin(v.t*2.2)*.05;
       if (noteT <= 0 && playing){ spawnNote(v.x + (Math.random() - .5)*.6, 2.1, v.z); }
     }
     if (v.kind === 'piano'){ p.arms.forEach((a, i) => { a.rotation.x = -1.08 + Math.sin(v.t*9 + i*2)*.05; a.rotation.z = Math.sin(v.t*1.3 + i)*.12; }); p.head.rotation.x = Math.sin(v.t*3)*.08; if (noteT <= 0) spawnNote(v.x + .6, 2.0, v.z); }
@@ -1136,7 +1157,7 @@ function updateVisitors(dt){
         v.timer -= dt; footAI(v, dt);
         if (v.timer <= 0 && v.kick <= 0){ v.state = 'back'; v.path = NICO_BACK; v.pi = 0; }
       }
-      const ty = v.state === 'sing' ? STAGE_Y - .04 : onStage(v.x, v.z) ? STAGE_Y : 0; v.y = (v.y === undefined ? STAGE_Y - .04 : v.y) + (ty - (v.y === undefined ? STAGE_Y - .04 : v.y))*Math.min(1, dt*6);
+      const ty = v.state === 'sing' ? STAGE_Y - .39 : onStage(v.x, v.z) ? STAGE_Y : 0; if (v.y === undefined) v.y = STAGE_Y - .39; v.y += (ty - v.y)*Math.min(1, dt*6);
       p.g.position.set(v.x, v.y, v.z); p.g.rotation.y = v.yaw;
     }
     if (v.kind === 'mathias'){ footAI(v, dt); p.g.position.set(v.x, 0, v.z); p.g.rotation.y = v.yaw; }
@@ -1168,7 +1189,7 @@ function pianoNote(f, t){ for (const [m, g0, type] of [[1, .16, 'sine'], [2, .05
 function slap(t){ const s = actx.createBufferSource(); s.buffer = noiseBuf; const bp = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2200; bp.Q.value = .8; const g = actx.createGain(); g.gain.setValueAtTime(.35, t); g.gain.exponentialRampToValueAtTime(.001, t + .09); s.connect(bp); bp.connect(g); g.connect(master); s.start(t); }
 const PROG = [[110, [220, 261.6, 329.6]], [146.8, [220, 293.7, 349.2]], [82.4, [207.7, 246.9, 293.7]], [110, [220, 261.6, 329.6]], [87.3, [174.6, 220, 261.6]], [146.8, [220, 293.7, 349.2]], [82.4, [207.7, 246.9, 293.7]], [110, [220, 261.6, 329.6]]];
 function schedule(){
-  if (!actx) return;
+  if (!actx || songState !== 'failed') return;
   const e8 = 60/88/2;
   while (nextT < actx.currentTime + .25){
     const bar = Math.floor(step/8) % PROG.length, s = step % 8, [bass, ch] = PROG[bar];
@@ -1181,17 +1202,25 @@ function schedule(){
     nextT += e8; step++;
   }
 }
+let songState = 'idle';
+function loadSong(){
+  songState = 'loading';
+  fetch('audio/morning-mornaight.mp3').then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+    .then(b => new Promise((ok, ko) => actx.decodeAudioData(b, ok, ko)))
+    .then(buf => { const s = actx.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(master); s.start(); songState = 'playing'; })
+    .catch(() => { songState = 'failed'; });
+}
 function initAudio(){
   if (actx || !soundOn) return;
   try {
-    actx = new (window.AudioContext || window.webkitAudioContext)(); master = actx.createGain(); master.gain.value = 0; master.connect(actx.destination);
+    actx = new (window.AudioContext || window.webkitAudioContext)(); master = actx.createGain(); master.gain.value = 0; master.connect(actx.destination); loadSong();
     noiseBuf = actx.createBuffer(1, actx.sampleRate*.1, actx.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1;
     nextT = actx.currentTime + .1; setInterval(schedule, 60);
   } catch(e){ actx = null; }
 }
 function updateAudio(){
   if (!actx) return;
-  const d = Math.hypot(pos.x - 6.5, pos.z - 42.5), v = soundOn ? Math.pow(Math.max(0, 1 - d/18), 1.6)*.7 : 0;
+  const d = Math.hypot(pos.x - 6.5, pos.z - 42.5), v = soundOn ? Math.pow(Math.max(0, 1 - d/18), 1.6)*(songState === 'playing' ? 1 : .7) : 0;
   master.gain.setTargetAtTime(v, actx.currentTime, .25);
 }
 addEventListener('pointerdown', initAudio); addEventListener('keydown', initAudio);
@@ -1411,6 +1440,7 @@ function groundAt(){
 let lastAct = undefined;
 function freeStep(dt){
   if (keys.left) pos.yaw += dt * 1.4; if (keys.right) pos.yaw -= dt * 1.4;
+  if (sitting){ if (keys.fwd || keys.back || keys.jump){ standUp(); keys.jump = false; } else { const a = actionTarget(); if (a !== lastAct){ lastAct = a; $('bAct').hidden = !a; if (a) $('bAct').textContent = a; } return; } }
   const v = (keys.fwd ? 1 : 0) - (keys.back ? 1 : 0);
   if (v){ pos.x = Math.max(-2, Math.min(46, pos.x - Math.sin(pos.yaw)*v*dt*2.4)); pos.z = Math.max(-2, Math.min(47, pos.z - Math.cos(pos.yaw)*v*dt*2.4)); }
   collide();
@@ -1424,7 +1454,7 @@ function setMode(m){
   mode = m;
   $('bTour').setAttribute('aria-pressed', m === 'tour'); $('bFree').setAttribute('aria-pressed', m === 'free');
   $('pad').hidden = $('help').hidden = m !== 'free'; $('progWrap').hidden = m !== 'tour';
-  if (m === 'tour'){ unlock(); setTag(false); look.yaw = look.pitch = 0; pos.y = 0; pos.vy = 0; clearTimeout(sayTimer); setCartel(null); if (seg >= stops.length - 1) restart(); else { const s = stops[seg]; Object.assign(pos, {x: s.x, z: s.z, yaw: s.yaw, pitch: s.pitch}); segT = 0; holding = !!s.hold; } }
+  if (m === 'tour'){ sitting = null; unlock(); setTag(false); look.yaw = look.pitch = 0; pos.y = 0; pos.vy = 0; clearTimeout(sayTimer); setCartel(null); if (seg >= stops.length - 1) restart(); else { const s = stops[seg]; Object.assign(pos, {x: s.x, z: s.z, yaw: s.yaw, pitch: s.pitch}); segT = 0; holding = !!s.hold; } }
   else { lastAct = undefined; setCartel(null); }
 }
 $('bTour').onclick = () => setMode('tour');
