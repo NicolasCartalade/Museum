@@ -724,7 +724,7 @@ const piano = new THREE.Group();
   sh.bezierCurveTo(0, 1.8, .3, 1.92, .55, 1.9); sh.lineTo(.75, 1.75); sh.lineTo(.75, 0);
   const body = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, {depth: .28, bevelEnabled: true, bevelThickness: .01, bevelSize: .01, bevelSegments: 1, curveSegments: 24}), black);
   body.rotation.x = Math.PI/2; body.position.y = .98; piano.add(body);
-  const lidP = new THREE.Group(); lidP.position.set(.75, .995, 0); lidP.rotation.z = .7;
+  const lidP = new THREE.Group(); lidP.position.set(.75, .995, 0); lidP.rotation.z = -.7;
   const lid = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, {depth: .015, bevelEnabled: false, curveSegments: 24}), black);
   lid.rotation.x = Math.PI/2; lid.position.x = -.75; lidP.add(lid); piano.add(lidP);
   piano.add(box(1.5, .1, .24, black, 0, .7, -.12));
