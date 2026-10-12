@@ -1817,6 +1817,7 @@ function updateAmbient(){
   if (!actx) return;
   if (!ambEl){
     ambEl = new Audio('audio/ambiance.mp3'); ambEl.loop = true; ambEl.preload = 'auto'; ambEl.crossOrigin = 'anonymous';
+    ambEl.addEventListener('loadedmetadata', () => { try { ambEl.currentTime = Math.random()*((isFinite(ambEl.duration) ? ambEl.duration : 3600) - 30); } catch(e){} }, {once: true});
     try { const src = actx.createMediaElementSource(ambEl); ambGain = actx.createGain(); ambGain.gain.value = 0; src.connect(ambGain); ambGain.connect(actx.destination); ambEl.volume = 1; }
     catch(e){ ambGain = null; ambEl.volume = 0; }
   }
