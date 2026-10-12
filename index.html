@@ -510,8 +510,8 @@ const EC = {x: 4.5, z: 31, r: 4}; ROOMH.E = H;
 }
 /* Salle secrète (home cinéma) derrière l’accueil */
 rectRoom('S', -9, 26.5, -0.2, 35.5, {h: 3.6, doors: {E: [[30.22, 31.78]]}, noHang: true});
-pair([-0.2, 30.22], [-0.2, 31.78], [0.62, 30.22], [0.62, 31.78]);
-{ const lin = new THREE.Mesh(new THREE.BoxGeometry(.95, H - 2.7, 1.8), mats.E); lin.position.set(.17, 2.7 + (H - 2.7)/2, 31); scene.add(lin); walls.push(lin); }
+pair([-0.2, 30.22], [-0.2, 31.78], [0.4, 30.22], [0.4, 31.78]);
+{ const lin = new THREE.Mesh(new THREE.BoxGeometry(.9, H - 2.7, 1.84), mats.E); lin.position.set(.15, 2.7 + (H - 2.7)/2, 31); scene.add(lin); walls.push(lin); }
 /* Salle 10 : ovale 18 × 9 m */
 const CX = 22, CZ = 5, RX = 9, RZ = 4.5; ROOMH[10] = H;
 const E10 = t => [CX + RX*Math.cos(t), CZ + RZ*Math.sin(t)];
@@ -1637,11 +1637,11 @@ setTimeout(() => { if (mode === 'tour' && seg < 2) setCartel(null); }, 5000);
 }
 
 /* ---------- salle secrète : home cinéma ---------- */
-const DOOR = {x: .45, z: 31, w: 1.58};
-const doorMesh = new THREE.Mesh(new THREE.BoxGeometry(.12, 2.7, DOOR.w), mats.E); doorMesh.position.set(DOOR.x, 1.35, DOOR.z); scene.add(doorMesh); walls.push(doorMesh);
+const DOOR = {x: .55, z: 31, w: 1.84};
+const doorMesh = new THREE.Mesh(new THREE.BoxGeometry(.1, 2.7, DOOR.w), mats.E); doorMesh.position.set(DOOR.x, 1.35, DOOR.z); scene.add(doorMesh); walls.push(doorMesh);
 const doorSeg = [DOOR.x, DOOR.z - DOOR.w/2, DOOR.x, DOOR.z + DOOR.w/2]; segs.push(doorSeg);
 const doorTrim = new THREE.Group(); doorTrim.visible = false; scene.add(doorTrim);
-{ const gold = new THREE.MeshBasicMaterial({color: 0xd4ae4f}); for (const z of [DOOR.z - DOOR.w/2 - .03, DOOR.z + DOOR.w/2 + .03]) at(doorTrim, new THREE.Mesh(new THREE.BoxGeometry(.04, 2.76, .05), gold), .63, 1.38, z); at(doorTrim, new THREE.Mesh(new THREE.BoxGeometry(.04, .05, DOOR.w + .12), gold), .66, 2.74, DOOR.z); }
+{ const gold = new THREE.MeshBasicMaterial({color: 0xd4ae4f}); for (const z of [DOOR.z - DOOR.w/2 + .2, DOOR.z + DOOR.w/2 - .2]) at(doorTrim, new THREE.Mesh(new THREE.BoxGeometry(.04, 2.76, .05), gold), .62, 1.38, z); at(doorTrim, new THREE.Mesh(new THREE.BoxGeometry(.04, .05, DOOR.w - .36), gold), .62, 2.74, DOOR.z); }
 let unlocked = false, doorOpen = 0, doorHinted = false, secretSeen = false;
 function allQuizDone(){ return Object.keys(QUIZ).every(r => validated[r]); }
 function secretUnlocked(announce){
