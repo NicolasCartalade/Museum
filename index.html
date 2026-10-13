@@ -1719,19 +1719,26 @@ setTimeout(() => { if (mode === 'tour' && seg < 2) setCartel(null); }, 5000);
     for (const y of [44, 84]){ g.beginPath(); g.moveTo(26, y + 22); g.lineTo(64, y - 14); g.lineTo(102, y + 22); g.stroke(); }
   });
   const mat = new THREE.MeshBasicMaterial({map: tex, transparent: true, opacity: .8, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2});
-  const MAIN = [[6.2, 31], [11, 31], [15.4, 31], [17.6, 31], [23.4, 31], [25.6, 31], [31.4, 31], [33.6, 31], [43, 31], [43, 27.3], [39, 20.7], [39, 18.3], [37, 11.7], [37, 9.0], [35.2, 7.0], [33.75, 8.6], [33, 11.6], [33, 19.9], [31.2, 19.9], [28, 22.25], [15.5, 22.25], [12, 19.3], [12, 16.7], [17, 11.7], [17, 8.0], [14, 5], [10.3, 5], [6, 8.3], [6, 9.7], [6, 14.3], [6, 15.7], [7.1, 22.3], [7.1, 24.6], [4.5, 25.3], [4.5, 28], [2.7, 31], [4.5, 34], [4.5, 37.3], [12.3, 38], [14.8, 38]];
+  const MAIN = [[6.2, 31], [11, 31], [15.4, 31], [17.6, 31], [23.4, 31], [25.6, 31], [31.4, 31], [33.6, 31], [43, 31], [43, 27.3], [39, 20.7], [39, 18.3], [37, 11.7], [37, 9.0], [35.2, 7.0], [33.75, 8.6], [33, 11.6], [33, 19.9], [31.2, 19.9], [27, 21.4], [16, 21.4], [15.2, 24.3], [24.6, 25.27, 0], [26.0, 25.27, 0], [29.9, 25.27, 2.6], [30.9, 24.6, 2.8], [29.9, 23.97, 2.8], [26.3, 23.97, 5.2], [25.0, 23.97, 5.4], [13.5, 24.2, 5.4], [11.6, 22.2, 5.4], [13.5, 19.7, 5.4], [29.5, 19.7, 5.4], [30.6, 21.6, 5.4], [25.4, 22.6, 5.4], [25.0, 23.97, 5.4], [26.3, 23.97, 5.2], [29.9, 23.97, 2.8], [30.9, 24.6, 2.8], [29.9, 25.27, 2.6], [26.0, 25.27, 0], [24.4, 25.27, 0], [14.2, 23.6], [12, 19.3], [12, 16.7], [17, 11.7], [17, 8.0], [14, 5], [10.3, 5], [6, 8.3], [6, 9.7], [6, 14.3], [6, 15.7], [7.1, 22.3], [7.1, 24.6], [4.5, 25.3], [4.5, 28], [2.7, 31], [4.5, 34], [4.5, 37.3], [12.3, 38], [14.8, 38]];
   const BACK = [[14.8, 38], [12.3, 38], [5.2, 37.4], [4.5, 34.4], [6.3, 32.4], [7.4, 31.3]];
+  const stairY = (x, z, y) => {
+    if (z > 24.62 && z < 25.92 && x >= 26 && x < 29.9) return .2*(Math.floor((x - 26)/.3) + 1);
+    if (x >= 29.9 && x <= 31.9 && z > 23.3 && z < 26) return 2.8;
+    if (z > 23.33 && z <= 24.62 && x >= 26.3 && x < 29.9) return 3.0 + .2*Math.floor((29.9 - x)/.3);
+    return y > 2.7 ? 5.4 : 0;
+  };
   const pts = [];
   for (const P of [MAIN, BACK]){
     let carry = .9;
     for (let i = 0; i < P.length - 1; i++){
-      const [ax, az] = P[i], [bx, bz] = P[i+1], L = Math.hypot(bx - ax, bz - az), dx = (bx - ax)/L, dz = (bz - az)/L;
-      for (let s = carry; s < L; s += 2.1){ pts.push([ax + dx*s - dz*.35, az + dz*s + dx*.35, Math.atan2(-dx, -dz)]); carry = s + 2.1 - L; }
+      const [ax, az, ay = 0] = P[i], [bx, bz, by = 0] = P[i+1], L = Math.hypot(bx - ax, bz - az), dx = (bx - ax)/L, dz = (bz - az)/L, sp = ay !== by ? .9 : 2.1;
+      if (ay !== by && carry > sp) carry = .3;
+      for (let s = carry; s < L; s += sp){ const x = ax + dx*s - dz*.35, z = az + dz*s + dx*.35; pts.push([x, z, Math.atan2(-dx, -dz), stairY(x, z, ay + (by - ay)*s/L)]); carry = s + sp - L; }
       if (carry > L) carry -= L;
     }
   }
   const im = new THREE.InstancedMesh(new THREE.PlaneGeometry(.5, .5), mat, pts.length), q = new THREE.Quaternion(), flat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI/2), m4 = new THREE.Matrix4(), one = new THREE.Vector3(1, 1, 1);
-  pts.forEach(([x, z, a], i) => { q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), a).multiply(flat); m4.compose(new THREE.Vector3(x, .016, z), q, one); im.setMatrixAt(i, m4); });
+  pts.forEach(([x, z, a, y], i) => { q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), a).multiply(flat); m4.compose(new THREE.Vector3(x, (y || 0) + .016, z), q, one); im.setMatrixAt(i, m4); });
   scene.add(im);
 }
 
