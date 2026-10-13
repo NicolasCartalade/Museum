@@ -707,8 +707,9 @@ function hangRoom(room, keep){
 hangRoom(10, true);
 
 /* ---------- où suis-je ? ---------- */
-const ROOMS = {W: ['Faille spatiale', 'Couloir de l’hyperespace'], E: ['Entrée', 'Accueil du musée'], 1: ['Salle 1', 'Antiquité et Orient'], 2: ['Salle 2', 'Gothique et première Renaissance'], 3: ['Salle 3', 'Renaissance florentine'], 4: ['Salle 4', 'La Sixtine'], 5: ['Salle 5', 'Venise et maniérisme'], 6: ['Salle 6', 'Le Grand Siècle'], 7: ['Salle 7', 'Lumières et rococo'], 8: ['Salle 8', 'Romantisme et orientalisme'], 9: ['Salle 9', 'Réalisme et symbolisme'], 10: ['Salle 10', 'Impressionnisme'], 11: ['Salle 11', 'Post-impressionnisme'], c: ['Couloir', 'Couloir de l’amitié'], 12: ['Salle 12', 'Fauvisme et modernités'], A: ['Archives', 'Œuvres disparues et archives'], K: ['Salle de concert', 'Nodí tri · Kuatu Kadéra'], P: ['Terrain de sport', 'Le foot du musée'], '8b': ['Salle 8 · étage', 'Paysages romantiques et la Smalah'], S: ['Salle secrète', 'Home cinéma'], p: ['Passage', 'Entre deux salles']};
+const ROOMS = {W: ['Faille spatiale', 'Couloir de l’hyperespace'], E: ['Entrée', 'Accueil du musée'], 1: ['Salle 1', 'Antiquité et Orient'], 2: ['Salle 2', 'Gothique et première Renaissance'], 3: ['Salle 3', 'Renaissance florentine'], 4: ['Salle 4', 'La Sixtine'], 5: ['Salle 5', 'Venise et maniérisme'], 6: ['Salle 6', 'Le Grand Siècle'], 7: ['Salle 7', 'Lumières et rococo'], 8: ['Salle 8', 'Romantisme et orientalisme'], 9: ['Salle 9', 'Réalisme et symbolisme'], 10: ['Salle 10', 'Impressionnisme'], 11: ['Salle 11', 'Post-impressionnisme'], c: ['Couloir', 'Couloir de l’amitié'], 12: ['Salle 12', 'Fauvisme et modernités'], A: ['Archives', 'Œuvres disparues et archives'], K: ['Salle de concert', 'Nodí tri · Kuatu Kadéra'], P: ['Terrain de sport', 'Le foot du musée'], '8b': ['Salle 8 · étage', 'Paysages romantiques et la Smalah'], X: ['Salle secrète II', 'La crypte de la balle d’or'], S: ['Salle secrète', 'Home cinéma'], p: ['Passage', 'Entre deux salles']};
 function roomAt(x, z, y){
+  if (y < -1 && x > 0 && x < 13 && z > 36.5 && z < 45) return 'X';
   if (y > 2.6 && x > F8.x0 && x < F8.x1 && z > F8.z0 && z < F8.z1) return '8b';
   if (x > 32.05 && x < 33.95 && z > 9.2 && z < 21.6) return 'W';
   if (((x-CX)/RX)**2 + ((z-CZ)/RZ)**2 < 1) return '10';
@@ -785,7 +786,9 @@ function updatePunch(dt){
 
 /* Salle de concert : scène, rideau, chaises, piano */
 {
-  scene.add(box(11, .35, 3, lam(0x5a3a22), 6.5, .175, 43.1)); solid(6.5, 43.1, 5.5, 1.5, 0, .35);
+  { const sm = lam(0x5a3a22);
+    for (const [x0, x1, z0, z1] of [[1, 12, 41.6, 43.7], [1, 7.0, 43.7, 44.6], [11.8, 12, 43.7, 44.6], [7.0, 11.8, 44.5, 44.6]]){
+      scene.add(box(x1 - x0, .35, z1 - z0, sm, (x0 + x1)/2, .175, (z0 + z1)/2)); solid((x0 + x1)/2, (z0 + z1)/2, (x1 - x0)/2, (z1 - z0)/2, 0, .35); } }
   const ct = canvasTex(256, 128, (g, w, h) => { for (let x = 0; x < w; x++){ const v = 110 + Math.sin(x/9)*60; g.fillStyle = `rgb(${v + 40},${v*.15},${v*.2})`; g.fillRect(x, 0, 1, h); } });
   ct.wrapS = THREE.RepeatWrapping; ct.repeat.set(3, 1);
   scene.add(box(12.6, 4.6, .12, new THREE.MeshLambertMaterial({map: ct}), 6.5, 2.4, 44.82));
@@ -1006,7 +1009,8 @@ const valentin = human({name: 'Valentin', skin: skinD, hair: 0x8a6239, pants: la
   const back = new THREE.Mesh(new THREE.CylinderGeometry(.078, .078, .004, 24), lam(0x111111)); back.rotation.x = Math.PI/2; back.position.set(0, -.17, .011); pad.add(back);
   valentin.arms[0].add(pad);
 }
-{ const s = standBy('cypres', 3.0, -1.0); place(valentin, s.x, 0, s.z, s.yaw, 'pong'); }
+let vValentin = null, valBubble = null;
+{ const s = standBy('cypres', 3.0, -1.0); vValentin = place(valentin, s.x, 0, s.z, s.yaw, 'pong'); valBubble = bubble('Je suis triste… J’ai ma raquette mais j’ai perdu ma balle dans le musée. Tu peux me la ramener ?'); valBubble.scale.set(1.9, .77, 1); valBubble.position.y = 2.62; valentin.g.add(valBubble); }
 const thomas = human({name: 'Thomas', skin: skinA, cap: 0x15151a, pants: lam(0x222226), sleeve: lam(0x5a6b3a), torso: shirtMats(0x5a6b3a)});
 {
   const wire = lam(0xf2f2f2);
@@ -1145,16 +1149,16 @@ function updateBalls(dt){
 function ballSub(dt){
   stepBall(football, dt);
   if (goalT > 0){ goalT -= dt; if (goalT <= 0) Object.assign(football, {x: 22, y: .11, z: 41.25, vx: 0, vy: 0, vz: 0}); }
-  else if (Math.abs(football.z - 41.25) < 1.45 && football.y < 1.55 && (football.x < 14.55 || football.x > 29.45)){ goals++; goalT = 1.6; if (roomAt(pos.x, pos.z) === 'P') say('BUT !', goals + (goals > 1 ? ' buts marqués' : ' but marqué') + ' au terrain du musée.'); }
+  else if (Math.abs(football.z - 41.25) < 1.45 && football.y < 1.55 && (football.x < 14.55 || football.x > 29.45)){ goals++; goalT = 1.6; if (football.by === 'me'){ football.by = null; sportAdd('g'); } if (roomAt(pos.x, pos.z) === 'P') say('BUT !', goals + (goals > 1 ? ' buts marqués' : ' but marqué') + ' au terrain du musée.' + sportTxt('g')); }
   const py = stepBall(basket, dt);
   if (py > HOOP.y && basket.y <= HOOP.y && basket.vy < 0){
     const fr = (py - HOOP.y)/(py - basket.y || 1), hd = Math.hypot(basket.px + (basket.x - basket.px)*fr - HOOP.x, basket.pz + (basket.z - basket.pz)*fr - HOOP.z);
-    if (hd < .17){ baskets++; say('Panier !', baskets + (baskets > 1 ? ' paniers' : ' panier') + ' en salle 8.'); basket.vx *= .3; basket.vz *= .3; }
+    if (hd < .17){ baskets++; sportAdd('b'); say('Panier !', baskets + (baskets > 1 ? ' paniers' : ' panier') + ' en salle 8.' + sportTxt('b')); basket.vx *= .3; basket.vz *= .3; }
     else if (hd < .32){ basket.vy = Math.abs(basket.vy)*.45; basket.vx += (basket.x - HOOP.x)*3; basket.vz += (basket.z - HOOP.z)*3; }
   }
   if (mode === 'free'){
     const dx = football.x - pos.x, dz = football.z - pos.z, d = Math.hypot(dx, dz);
-    if (d < .5 && pos.y < .4){ const fx = -Math.sin(pos.yaw), fz = -Math.cos(pos.yaw); kickBall(football, dx/d*.4 + fx, dz/d*.4 + fz, Math.max(2.6, Math.hypot(football.vx, football.vz)), .3); }
+    if (d < .5 && pos.y < .4){ const fx = -Math.sin(pos.yaw), fz = -Math.cos(pos.yaw); kickBall(football, dx/d*.4 + fx, dz/d*.4 + fz, Math.max(2.6, Math.hypot(football.vx, football.vz)), .3); football.by = 'me'; }
   }
 }
 let sitting = null;
@@ -1174,6 +1178,7 @@ function standUp(){ if (!sitting) return; const fx = -Math.sin(pos.yaw), fz = -M
 function actionTarget(){
   if (mode !== 'free') return null;
   if (sitting) return 'Se lever';
+  if (Math.abs(pos.y) > 1) return null;
   const c = [['Tirer', Math.hypot(football.x - pos.x, football.z - pos.z), 2.2], ['Lancer', Math.hypot(basket.x - pos.x, basket.z - pos.z), 1.8], ['Frapper', Math.hypot(PB.x - pos.x, PB.z - pos.z), 1.8]].filter(a => a[1] < a[2]).sort((a, b) => a[1] - b[1]);
   if (c.length) return c[0][0];
   return nearSeat() ? 'S’asseoir' : null;
@@ -1183,8 +1188,8 @@ function doAction(){
   const a = actionTarget(), fx = -Math.sin(pos.yaw), fz = -Math.cos(pos.yaw);
   if (a === 'Se lever') standUp();
   else if (a === 'S’asseoir') sitDown(nearSeat());
-  else if (a === 'Tirer') kickBall(football, fx, fz, 10.5, Math.max(1.5, Math.min(7, 2.5 + pos.pitch*8)));
-  else if (a === 'Frapper'){ hitPunch(PB.x - pos.x, PB.z - pos.z, 3.4); say('Punching-ball', 'Bien frappé !', 1200); }
+  else if (a === 'Tirer'){ kickBall(football, fx, fz, 10.5, Math.max(1.5, Math.min(7, 2.5 + pos.pitch*8))); football.by = 'me'; }
+  else if (a === 'Frapper'){ hitPunch(PB.x - pos.x, PB.z - pos.z, 3.4); sportAdd('p'); say('Punching-ball', 'Bien frappé !' + sportTxt('p'), 1200); }
   else if (a === 'Lancer'){
     const sx = pos.x + fx*.35, sy = 1.95 + pos.y, sz = pos.z + fz*.35, hx = HOOP.x - sx, hz = HOOP.z - sz, dh = Math.hypot(hx, hz);
     const err = Math.abs(angDiff(Math.atan2(fx, fz), Math.atan2(hx, hz)));
@@ -1240,7 +1245,7 @@ function footAI(v, dt, others){
     if (mate && Math.random() < .65){ tx = mate.x; tz = mate.z; sp = Math.min(8, 2.4 + Math.hypot(tx - b.x, tz - b.z)*.8); }
     else if (meIn && Math.random() < .6){ tx = pos.x; tz = pos.z; sp = Math.min(8, 2.4 + Math.hypot(tx - b.x, tz - b.z)*.8); }
     else { tx = v.home[0] > 22 ? 14.3 : 29.7; tz = 41.25 + (Math.random() - .5)*2.2; sp = 9; }
-    kickBall(b, tx - b.x, tz - b.z, sp, sp > 8.5 ? 1.6 : 1.2); v.cool = 2; v.kick = .35;
+    kickBall(b, tx - b.x, tz - b.z, sp, sp > 8.5 ? 1.6 : 1.2); football.by = 'ai'; v.cool = 2; v.kick = .35;
   } else if (chase){ walkTo(v, b.x, b.z, 2.1, dt); }
   else if (!walkTo(v, v.home[0], v.home[1], 1.2, dt)){} else { v.yaw += angDiff(v.yaw, Math.atan2(b.x - v.x, b.z - v.z)) * Math.min(1, dt*4); walkAnim(v.p, 0, 0); }
   if (v.kick > 0){ v.p.legs[1].thigh.rotation.x = -Math.sin((.35 - v.kick)/.35*Math.PI)*1.1; v.p.legs[1].shin.rotation.x = .2; }
@@ -1311,7 +1316,7 @@ function updateVisitors(dt){
       p.arms.forEach((a, i) => { a.rotation.x = v.dive > 0 ? -2.6 : -.55; a.rotation.z = (i ? 1 : -1)*(v.dive > 0 ? .35 : .45); });
       if (v.cool <= 0 && b.vx > 1 && b.x > 27.6 && b.x < 29.5 && Math.abs(b.z - v.z) < 1.1 && b.y < 1.9){
         v.cool = 1.2;
-        if (Math.random() < .7){ v.z += (b.z - v.z)*.8; v.dive = .6; kickBall(b, -1, (Math.random() - .5)*.7, 7.5, 2.4); if (roomAt(pos.x, pos.z) === 'P') say('Arrêt d’Andrés !', 'Le gardien colombien sort la balle.', 1500); }
+        if (Math.random() < .7){ v.z += (b.z - v.z)*.8; v.dive = .6; kickBall(b, -1, (Math.random() - .5)*.7, 7.5, 2.4); football.by = 'ai'; if (roomAt(pos.x, pos.z) === 'P') say('Arrêt d’Andrés !', 'Le gardien colombien sort la balle.', 1500); }
       }
       p.g.position.set(v.x, v.dive > 0 ? .15 : 0, v.z); p.g.rotation.y = v.yaw;
     }
@@ -1465,7 +1470,7 @@ addEventListener('keydown', e => { if (quizOpen || e.repeat || $('concert').hidd
 
 /* ---------- quiz ---------- */
 let validated = {};
-try { if (/[?&]reset\b/.test(location.search)){ localStorage.removeItem('wm-quiz'); history.replaceState(null, '', location.pathname); } } catch(e){}
+try { if (/[?&]reset\b/.test(location.search)){ localStorage.removeItem('wm-quiz'); localStorage.removeItem('wm-sport'); localStorage.removeItem('wm-ball'); history.replaceState(null, '', location.pathname); } } catch(e){}
 try { validated = JSON.parse(localStorage.getItem('wm-quiz') || '{}') || {}; } catch(e){ validated = {}; }
 function refreshScore(){
   const n = Object.keys(QUIZ).filter(r => validated[r]).length; $('valid').textContent = n;
@@ -1660,7 +1665,7 @@ function collide(){
       if (d < m && d > 1e-6){ pos.x = qx + dx/d*m; pos.z = qz + dz/d*m; }
     }
     for (const b of solids){
-      if (pos.y >= b.top - .22) continue;
+      if (pos.y >= b.top - .22 || (pos.y < -1 && !b.bas)) continue;
       const dx = pos.x - b.cx, dz = pos.z - b.cz, lx = dx*b.c - dz*b.s, lz = dx*b.s + dz*b.c;
       const qx = Math.max(-b.hw, Math.min(b.hw, lx)), qz = Math.max(-b.hd, Math.min(b.hd, lz));
       let px = lx - qx, pz = lz - qz; const d = Math.hypot(px, pz);
@@ -1672,10 +1677,10 @@ function collide(){
   }
 }
 function groundAt(){
-  let g = 0;
+  let g = inCrypt(pos.x, pos.z) ? CRYPT.y : 0;
   for (const b of solids){
     const dx = pos.x - b.cx, dz = pos.z - b.cz, lx = dx*b.c - dz*b.s, lz = dx*b.s + dz*b.c;
-    if (Math.abs(lx) <= b.hw + .1 && Math.abs(lz) <= b.hd + .1 && pos.y >= b.top - .22) g = Math.max(g, b.top);
+    if (Math.abs(lx) <= b.hw + .1 && Math.abs(lz) <= b.hd + .1 && pos.y >= b.top - .22 && !(pos.y < -1 && !b.bas)) g = Math.max(g, b.top);
   }
   for (const p of PLAT) if (pos.x >= p.x0 && pos.x <= p.x1 && pos.z >= p.z0 && pos.z <= p.z1 && pos.y >= p.y - .22) g = Math.max(g, p.y);
   return g;
@@ -1937,13 +1942,152 @@ function updateAmbient(){
   if (v === 0 && !ambEl.paused && (ambGain ? ambGain.gain.value : ambEl.volume) < .003) ambEl.pause();
 }
 
+/* ---------- défi sportif, trappe, crypte et balle d’or ---------- */
+let sport = {b: 0, g: 0, p: 0};
+try { sport = Object.assign(sport, JSON.parse(localStorage.getItem('wm-sport') || '{}')); } catch(e){}
+const GOAL = {b: 20, g: 5, p: 15};
+function sportDone(){ return sport.b >= GOAL.b && sport.g >= GOAL.g && sport.p >= GOAL.p; }
+function sportTxt(k){ return sport[k] <= GOAL[k] ? ' · ' + Math.min(sport[k], GOAL[k]) + '/' + GOAL[k] : ''; }
+function sportAdd(k){
+  const was = sportDone(); sport[k]++;
+  try { localStorage.setItem('wm-sport', JSON.stringify(sport)); } catch(e){}
+  if (!was && sportDone()) setTimeout(() => say('Un bruit sourd sur la scène…', 'Une trappe s’est ouverte derrière le piano de Safir, près du rideau.', 6000), 2600);
+}
+const CRYPT = {x0: 0, x1: 13, z0: 36.5, z1: 45, y: -3.2};
+function inCrypt(x, z){ return x > CRYPT.x0 && x < CRYPT.x1 && z > CRYPT.z0 && z < CRYPT.z1; }
+// sol de la salle de concert = plancher au-dessus de la crypte (trémie de l’escalier exclue)
+PLAT.push({x0: 0, x1: 13, z0: 36.5, z1: 43.7, y: 0}, {x0: 0, x1: 7.0, z0: 43.7, z1: 45, y: 0}, {x0: 11.8, x1: 13, z0: 43.7, z1: 45, y: 0}, {x0: 7.0, x1: 11.8, z0: 44.5, z1: 45, y: 0});
+// le grand parquet est percé au-dessus de l’escalier
+{
+  const sh = new THREE.Shape(); sh.moveTo(-26, 25); sh.lineTo(70, 25); sh.lineTo(70, -71); sh.lineTo(-26, -71); sh.lineTo(-26, 25);
+  const hole = new THREE.Path(); hole.moveTo(7.0, -43.7); hole.lineTo(7.0, -44.5); hole.lineTo(11.8, -44.5); hole.lineTo(11.8, -43.7); hole.lineTo(7.0, -43.7); sh.holes.push(hole);
+  const t = parquet.clone(); t.needsUpdate = true; t.repeat.set(.25, .25);
+  floor.geometry.dispose(); floor.geometry = new THREE.ShapeGeometry(sh); floor.material = new THREE.MeshLambertMaterial({map: t}); floor.position.set(0, 0, 0);
+}
+// trappe (fermée = on marche dessus)
+const trapSolid = {cx: 9.4, cz: 44.1, hw: 2.4, hd: .4, yaw: 0, top: .35, c: 1, s: 0}; solids.push(trapSolid);
+const trapPivot = new THREE.Group(); trapPivot.position.set(9.4, .35, 44.5); scene.add(trapPivot);
+{
+  const lidTex = canvasTex(512, 96, (g, w, h) => { g.fillStyle = '#5a3a22'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(30,18,10,.6)'; g.lineWidth = 3; for (let x = 0; x < w; x += 64){ g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); } g.strokeRect(2, 2, w - 4, h - 4); });
+  const lid = new THREE.Mesh(new THREE.BoxGeometry(4.8, .04, .8), new THREE.MeshLambertMaterial({map: lidTex})); lid.position.set(0, .02, -.4); trapPivot.add(lid);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(.05, .01, 6, 16), lam(0xb8923e)); ring.rotation.x = Math.PI/2; ring.position.set(0, .045, -.7); trapPivot.add(ring);
+}
+let trapOpen = 0;
+// crypte : murs, sol, plafond, escalier
+{
+  const Y = CRYPT.y, stoneW = lam(0x3b3330), floorM = lam(0x2a2422);
+  for (const [x1, z1, x2, z2] of [[0, 36.5, 13, 36.5], [13, 36.5, 13, 45], [13, 45, 0, 45], [0, 45, 0, 36.5]]){
+    const L = Math.hypot(x2 - x1, z2 - z1), m = new THREE.Mesh(new THREE.BoxGeometry(L + .2, -Y, .2), stoneW); m.position.set((x1 + x2)/2, Y/2, (z1 + z2)/2); m.rotation.y = -Math.atan2(z2 - z1, x2 - x1); scene.add(m);
+  }
+  segs.push([3.6, 36.5, 5.4, 36.5, -99, -1], [13, 37.2, 13, 38.8, -99, -1]);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(13, 8.5), floorM); fl.rotation.x = -Math.PI/2; fl.position.set(6.5, Y + .005, 40.75); scene.add(fl);
+  const ce = new THREE.Mesh(new THREE.PlaneGeometry(13, 8.5), lam(0x1d1715)); ce.rotation.x = Math.PI/2; ce.position.set(6.5, -.02, 40.75); scene.add(ce);
+  for (let x = .8; x < 13; x += 2.1){ const beam = new THREE.Mesh(new THREE.BoxGeometry(.18, .22, 8.5), lam(0x3a2516)); beam.position.set(x, -.13, 40.75); scene.add(beam); }
+  const st = lam(0x6e625a);
+  for (let i = 0; i < 17; i++){ const top = .15 - .2*i, x0 = 11.8 - .28*(i + 1), cx = x0 + .14, h = top - Y;
+    const b = new THREE.Mesh(new THREE.BoxGeometry(.28, h, .8), st); b.position.set(cx, Y + h/2, 44.1); scene.add(b);
+    solids.push({cx, cz: 44.1, hw: .14, hd: .4, yaw: 0, top, c: 1, s: 0, bas: true}); }
+  // torches et lumière dorée
+  const L1 = new THREE.PointLight(0xffc46b, 1.1, 11); L1.position.set(6.5, -1.0, 40.4); scene.add(L1);
+  for (const [x, z] of [[.15, 38.5], [.15, 42.5], [12.85, 38.5], [12.85, 42.5]]){ const f = new THREE.Mesh(new THREE.BoxGeometry(.1, .25, .1), new THREE.MeshBasicMaterial({color: 0xffb347})); f.position.set(x, Y + 2.0, z); scene.add(f); }
+  // panneau d’indice
+  const tex = canvasTex(1024, 420, (g, w, h) => { g.fillStyle = '#15100c'; g.fillRect(0, 0, w, h); g.strokeStyle = '#c9a54a'; g.lineWidth = 8; g.strokeRect(14, 14, w - 28, h - 28);
+    g.textAlign = 'center'; g.fillStyle = '#e8c766'; g.font = '700 58px Georgia, serif'; g.fillText('La balle d’or de Valentin', w/2, 95);
+    g.fillStyle = '#f0e2bd'; g.font = 'italic 38px Georgia, serif'; g.fillText('Le socle ne s’ouvre qu’avec le code secret.', w/2, 180);
+    g.fillText('Une lettre dorée se cache au sol de chaque salle,', w/2, 245); g.fillText('de la salle 1 à la salle 12 : lis-les dans l’ordre.', w/2, 300);
+    g.fillStyle = '#c9a54a'; g.font = '30px Georgia, serif'; g.fillText('Approche-toi du socle et appuie sur F pour entrer le code.', w/2, 370); });
+  const pl = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.31), new THREE.MeshBasicMaterial({map: tex})); pl.position.set(6.5, Y + 1.75, 36.62); scene.add(pl);
+}
+// socle et balle
+const ped = new THREE.Group(); ped.position.set(6.5, CRYPT.y, 40.4); scene.add(ped);
+const pedTop = new THREE.Group(); ped.add(pedTop);
+const goldBall = new THREE.Mesh(new THREE.SphereGeometry(.06, 24, 16), new THREE.MeshPhongMaterial({color: 0xf2c14e, emissive: 0x5a3b00, specular: 0xffffff, shininess: 120}));
+const dome = new THREE.Mesh(new THREE.SphereGeometry(.22, 24, 12, 0, Math.PI*2, 0, Math.PI/2), new THREE.MeshPhongMaterial({color: 0xcfe8ff, transparent: true, opacity: .25, shininess: 100}));
+{
+  const marble = lam(0xe8e2d8);
+  at(ped, new THREE.Mesh(new THREE.CylinderGeometry(.42, .5, .2, 24), marble), 0, .1, 0);
+  const col = new THREE.Mesh(new THREE.CylinderGeometry(.24, .28, .9, 24), marble); col.position.y = .65; ped.add(col);
+  at(pedTop, new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .06, 24), lam(0xb8923e)), 0, 1.13, 0);
+  at(pedTop, new THREE.Mesh(new THREE.CylinderGeometry(.17, .17, .38, 20), lam(0xb8923e)), 0, .91, 0);
+  goldBall.position.y = 1.22; pedTop.add(goldBall); dome.position.y = 1.16; pedTop.add(dome);
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(.12, .7, 3.0, 24, 1, true), new THREE.MeshBasicMaterial({color: 0xffe08a, transparent: true, opacity: .08, depthWrite: false, side: THREE.DoubleSide})); beam.position.y = 1.7; ped.add(beam);
+  solids.push({cx: 6.5, cz: 40.4, hw: .45, hd: .45, yaw: 0, top: CRYPT.y + 1.2, c: 1, s: 0, bas: true});
+}
+// lettres cachées au sol (L’ART PICTURAL)
+{
+  const CODE = 'LARTPICTURAL', spots = {1: [10.6, 34.4], 2: [17.6, 34.4], 3: [25.6, 34.4], 4: [33.6, 32.4], 5: [34.6, 27.4], 6: [34.6, 18.4], 7: [39.4, 7.2], 8: [9.9, 25.4], 9: [10.6, 16.9], 10: [16, 7], 11: [1.6, 8.4], 12: [.6, 22.4]};
+  Object.entries(spots).forEach(([room, [x, z]]) => {
+    const ch = CODE[room - 1], t = canvasTex(128, 128, (g, w, h) => { g.fillStyle = 'rgba(0,0,0,0)'; g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(201,165,74,.9)'; g.beginPath(); g.arc(w/2, h/2, 60, 0, 7); g.fill(); g.fillStyle = '#2a1c08'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '700 72px Georgia, serif'; g.fillText(ch, w/2, h/2 + 4); g.font = '700 20px Georgia, serif'; g.fillText(room, w/2, 18 + 6); });
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(.3, .3), new THREE.MeshBasicMaterial({map: t, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3})); m.rotation.x = -Math.PI/2; m.position.set(x, .018, z); scene.add(m);
+  });
+}
+let ballState = 'hidden'; // hidden → unlocked → carried → given
+try { const v = localStorage.getItem('wm-ball'); if (v === 'given' || v === 'carried') ballState = v; } catch(e){}
+let pedRise = 0;
+const valBall = new THREE.Mesh(new THREE.SphereGeometry(.03, 16, 12), goldBall.material); valBall.visible = false; scene.add(valBall);
+function saveBall(){ try { localStorage.setItem('wm-ball', ballState); } catch(e){} }
+function valentinHappy(){
+  if (valBubble){ valentin.g.remove(valBubble); }
+  valBubble = bubble('Merciii ! Ma balle dorée ! Tu es le héros du WikiMuseum !'); valBubble.scale.set(1.9, .77, 1); valBubble.position.y = 2.62; valentin.g.add(valBubble); valBall.visible = true;
+}
+if (ballState === 'given') valentinHappy();
+if (ballState !== 'hidden') goldBall.visible = dome.visible = ballState === 'unlocked';
+// fenêtre de saisie du code
+const codeBox = document.createElement('div');
+codeBox.innerHTML = '<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,8,6,.55);z-index:50"><form style="background:#15100c;border:2px solid #c9a54a;border-radius:10px;padding:18px 20px;color:#f0e2bd;font-family:Georgia,serif;width:min(340px,86vw);text-align:center"><div style="font-size:20px;color:#e8c766;margin-bottom:6px">Code du socle</div><div style="font-size:13px;opacity:.8;margin-bottom:12px">12 lettres, une par salle (1 → 12)</div><input autocomplete="off" style="width:100%;box-sizing:border-box;font:600 20px Georgia,serif;letter-spacing:.12em;text-transform:uppercase;padding:8px;border-radius:6px;border:1px solid #c9a54a;background:#241a12;color:#f6e7b8;text-align:center"><div class="msg" style="min-height:20px;margin-top:8px;font-size:14px"></div><div style="display:flex;gap:10px;justify-content:center;margin-top:8px"><button type="button" class="cx" style="padding:7px 14px;border-radius:999px;border:1px solid #6b5a3a;background:transparent;color:#f0e2bd">Annuler</button><button style="padding:7px 16px;border-radius:999px;border:0;background:#c9a54a;color:#1b140c;font-weight:700">Valider</button></div></form></div>';
+codeBox.hidden = true; document.body.appendChild(codeBox);
+const codeIn = codeBox.querySelector('input'), codeMsg = codeBox.querySelector('.msg');
+let codeOpen = false;
+function openCode(){ codeOpen = true; quizOpen = true; codeBox.hidden = false; codeIn.value = ''; codeMsg.textContent = ''; try { document.exitPointerLock && document.exitPointerLock(); } catch(e){} setTimeout(() => codeIn.focus(), 30); }
+function closeCode(){ codeOpen = false; quizOpen = false; codeBox.hidden = true; }
+codeBox.querySelector('.cx').onclick = closeCode;
+codeBox.querySelector('form').onsubmit = ev => { ev.preventDefault();
+  const v = codeIn.value.toUpperCase().normalize('NFD').replace(/[^A-Z]/g, '');
+  if (v === 'LARTPICTURAL'){ closeCode(); ballState = 'unlocked'; say('Clic… le socle se lève !', 'Prends la balle dorée (F) et rapporte-la à Valentin, en salle 11.', 5000); }
+  else { codeMsg.style.color = '#ff9b8a'; codeMsg.textContent = 'Mauvais code… cherche les lettres dorées au sol.'; } };
+codeIn.addEventListener('keydown', e => e.stopPropagation());
+// actions supplémentaires (F)
+const baseActionTarget = actionTarget, baseDoAction = doAction;
+function trapAction(){
+  if (mode !== 'free' || sitting) return null;
+  const dP = Math.hypot(pos.x - 6.5, pos.z - 40.4);
+  if (pos.y < -1 && dP < 1.5){ if (ballState === 'hidden') return 'Entrer le code'; if (ballState === 'unlocked' && pedRise > .95) return 'Prendre la balle'; }
+  if (ballState === 'carried' && vValentin && Math.hypot(pos.x - vValentin.x, pos.z - vValentin.z) < 2.3 && pos.y < 1) return 'Donner la balle';
+  return null;
+}
+actionTarget = function(){ return trapAction() || baseActionTarget(); };
+doAction = function(){
+  const a = trapAction();
+  if (a === 'Entrer le code') return openCode();
+  if (a === 'Prendre la balle'){ ballState = 'carried'; saveBall(); goldBall.visible = dome.visible = false; say('Balle dorée récupérée !', 'Va la rendre à Valentin, en salle 11 (Post-impressionnisme).', 4500); lastAct = undefined; return; }
+  if (a === 'Donner la balle'){ ballState = 'given'; saveBall(); valentinHappy(); say('Valentin', '« Merciii ! Ma balle dorée ! Tu es le héros du WikiMuseum ! »', 5000); lastAct = undefined; return; }
+  baseDoAction();
+};
+const ballChip = document.createElement('div');
+ballChip.textContent = '🏓 Balle dorée en main'; ballChip.style.cssText = 'position:fixed;top:92px;right:16px;background:rgba(21,19,26,.8);color:#f2c14e;border:1px solid rgba(242,193,78,.5);border-radius:999px;padding:6px 12px;font:600 13px Karla,Arial,sans-serif;z-index:5;pointer-events:none';
+document.body.appendChild(ballChip);
+let trapAnnounced = false;
+function updateTrap(dt){
+  const want = sportDone() ? 1 : 0;
+  trapOpen += Math.max(-dt*.8, Math.min(dt*.8, want - trapOpen));
+  trapPivot.rotation.x = trapOpen*1.75;
+  const i = solids.indexOf(trapSolid);
+  if (trapOpen > .5 && i >= 0) solids.splice(i, 1); else if (trapOpen <= .5 && i < 0) solids.push(trapSolid);
+  const up = ballState === 'unlocked' ? 1 : 0; pedRise += Math.max(-dt*.6, Math.min(dt*.6, up - pedRise));
+  pedTop.position.y = pedRise*.35; dome.position.y = 1.16 + pedRise*.35; dome.material.opacity = .25*(1 - pedRise);
+  goldBall.rotation.y += dt*1.5;
+  ballChip.hidden = ballState !== 'carried';
+  if (valBall.visible && vValentin){ const t = performance.now()/1000, ph = Math.abs(Math.sin(t*5)); valBall.position.set(vValentin.x + Math.sin(vValentin.yaw + .6)*.45, 1.05 + ph*.45, vValentin.z + Math.cos(vValentin.yaw + .6)*.45); }
+  if (roomAt(pos.x, pos.z, pos.y) === 'X' && !trapAnnounced){ trapAnnounced = true; if (ballState === 'hidden') say('La crypte de la balle d’or', 'Une balle de ping-pong dorée repose sous une cloche de verre…', 4500); }
+}
+
 let last = performance.now();
 function tick(now){
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
   resize();
   if (!quizOpen){ if (mode === 'tour') tourStep(dt); else freeStep(dt); }
   bowT = Math.max(0, bowT - dt); updateRoses(dt); updateWarp(dt);
-  updateGuards(dt); updateVisitors(dt); updateBalls(dt); updatePunch(dt); updateNotes(dt); updateKiosk(); updateAudio(); updateSecret(dt); updateBirds(); updateAmbient();
+  updateGuards(dt); updateVisitors(dt); updateBalls(dt); updatePunch(dt); updateNotes(dt); updateKiosk(); updateAudio(); updateSecret(dt); updateBirds(); updateAmbient(); updateTrap(dt);
   if (mode === 'tour' && !drag){ look.idle += dt; if (look.idle > 1.6){ const k = Math.min(1, dt*2.5); look.yaw -= look.yaw*k; look.pitch -= look.pitch*k; } }
   const lt = mode === 'tour';
   cam.position.set(pos.x, EYE + pos.y, pos.z); cam.rotation.set(pos.pitch + (lt ? look.pitch : 0), pos.yaw + (lt ? look.yaw : 0), 0);
