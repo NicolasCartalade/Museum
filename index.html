@@ -2028,6 +2028,7 @@ const dome = new THREE.Mesh(new THREE.SphereGeometry(.22, 24, 12, 0, Math.PI*2, 
     const m = new THREE.Mesh(new THREE.PlaneGeometry(.3, .3), new THREE.MeshBasicMaterial({map: t, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3})); m.rotation.x = -Math.PI/2; m.position.set(x, .018, z); scene.add(m);
   });
 }
+const _v3a = new THREE.Vector3();
 let ballState = 'hidden'; // hidden → unlocked → carried → given
 try { const v = localStorage.getItem('wm-ball'); if (v === 'given' || v === 'carried') ballState = v; } catch(e){}
 let pedRise = 0;
@@ -2036,6 +2037,7 @@ function saveBall(){ try { localStorage.setItem('wm-ball', ballState); } catch(e
 function valentinHappy(){
   if (valBubble){ valentin.g.remove(valBubble); }
   valBubble = bubble('Merciii ! Ma balle dorée ! Tu es le héros du WikiMuseum !'); valBubble.scale.set(1.9, .77, 1); valBubble.position.y = 2.62; valentin.g.add(valBubble); valBall.visible = true;
+  if (vValentin){ vValentin.kind = 'juggle'; valentin.g.rotation.y = vValentin.yaw; }
 }
 if (ballState === 'given') valentinHappy();
 if (ballState !== 'hidden') goldBall.visible = dome.visible = ballState === 'unlocked';
@@ -2085,7 +2087,18 @@ function updateTrap(dt){
   pedTop.position.y = pedRise*.35; dome.position.y = 1.16 + pedRise*.35; dome.material.opacity = .25*(1 - pedRise);
   goldBall.rotation.y += dt*1.5;
   ballChip.hidden = ballState !== 'carried';
-  if (valBall.visible && vValentin){ const t = performance.now()/1000, ph = Math.abs(Math.sin(t*5)); valBall.position.set(vValentin.x + Math.sin(vValentin.yaw + .6)*.45, 1.05 + ph*.45, vValentin.z + Math.cos(vValentin.yaw + .6)*.45); }
+  if (valBall.visible && vValentin){
+    // jonglage : raquette à plat, coups alternés coup droit / revers
+    const T = .62, t = performance.now()/1000, n = Math.floor(t/T), f = (t % T)/T, side = n % 2;
+    const arm = valentin.arms[0], tap = Math.exp(-f*9)*.12;
+    const a = 1.12 + tap; arm.rotation.x = -a; arm.rotation.y = 0; arm.rotation.z = side ? -.32 : .12;
+    const pad = arm.children[arm.children.length - 1]; pad.rotation.set(a - Math.PI/2, side ? Math.PI : 0, 0);
+    arm.updateWorldMatrix(true, true);
+    const blade = pad.children[1], bp = blade.getWorldPosition(_v3a);
+    const nx = Math.floor((t + T)/T) % 2 ? -.55 : .15; // position de la prochaine frappe (approx.)
+    valBall.position.set(bp.x, bp.y + .04 + .38*4*f*(1 - f), bp.z);
+    valentin.head.rotation.x = -.35 + .1*4*f*(1 - f);
+  }
   if (roomAt(pos.x, pos.z, pos.y) === 'X' && !trapAnnounced){ trapAnnounced = true; if (ballState === 'hidden') say('La crypte de la balle d’or', 'Une balle de ping-pong dorée repose sous une cloche de verre…', 4500); }
 }
 
