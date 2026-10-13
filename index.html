@@ -643,6 +643,15 @@ PLAT.push({x0: 9.3, x1: 26.0, z0: 18.5, z1: 26, y: F8.y}, {x0: 26.0, x1: 32, z0:
   const post = (x, y, z) => rail(x, y, z, x, y + .95, z);
   for (let k = 0; k <= 12; k++){ const x = 29.9 - .3*k, y = k < 12 ? 3.0 + .2*k : F8.y; post(x, k ? y - .2 : 2.8, 23.33); }
   rail(29.9, 2.8 + .95, 23.33, 26.3, 5.2 + .95, 23.33); rail(31.85, 2.8 + .95, 23.33, 29.9, 2.8 + .95, 23.33); post(31.85, 2.8, 23.33);
+  for (let k = 0; k <= 12; k++){ const x = 29.9 - .3*k, y = k < 12 ? 3.0 + .2*k : F8.y; post(x, k ? y - .2 : 3.0, 24.6); }
+  rail(29.9, 3.0 + .95, 24.6, 26.3, 5.2 + .95, 24.6); segs.push([26.3, 24.62, 29.9, 24.62, 2.9, 99]);
+  { const tex = canvasTex(1024, 512, (g, w, h) => {
+      g.fillStyle = '#16120e'; g.fillRect(0, 0, w, h); g.strokeStyle = '#c9a54a'; g.lineWidth = 10; g.strokeRect(18, 18, w - 36, h - 36); g.lineWidth = 3; g.strokeRect(38, 38, w - 76, h - 76);
+      g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#e8c766'; g.font = '700 84px Georgia, serif'; g.fillText('UPSTAIRS', w/2, 120);
+      g.fillStyle = '#f3e7c4'; g.font = 'italic 50px Georgia, serif'; g.fillText('One of the biggest paintings', w/2, 225); g.fillText('in the world awaits you!', w/2, 290);
+      g.fillStyle = '#c9a54a'; g.font = '34px Georgia, serif'; g.fillText('The Smalah · Horace Vernet · 21 metres wide', w/2, 370);
+      g.fillStyle = '#e8c766'; g.beginPath(); g.moveTo(w/2 - 70, 420); g.lineTo(w/2 + 40, 420); g.lineTo(w/2 + 40, 400); g.lineTo(w/2 + 90, 440); g.lineTo(w/2 + 40, 480); g.lineTo(w/2 + 40, 460); g.lineTo(w/2 - 70, 460); g.fill(); });
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.2), new THREE.MeshBasicMaterial({map: tex})); sign.position.set(28.4, 1.75, 23.32); sign.rotation.y = Math.PI; scene.add(sign); }
   rail(26.3, F8.y + .95, 23.31, 32, F8.y + .95, 23.31); for (let x = 26.3; x < 32; x += .6) post(x, F8.y, 23.31);
   rail(26.0, F8.y + .95, 24.6, 26.0, F8.y + .95, 26); rail(26.0, F8.y + .95, 24.6, 26.3, F8.y + .95, 24.6); for (let z = 24.6; z < 26; z += .5) post(26.0, F8.y, z);
   // cimaises de l'étage
