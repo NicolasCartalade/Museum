@@ -184,20 +184,21 @@ const WORKS = {
   ['ruines', 'Ruines d’un pont romain', 'Hubert Robert', 100, 130, 1],
   ['mestre', 'Vue de Mestre', 'Canaletto', 47, 74, 1]],
  8: [
-  ['minotaure', 'Le Naufrage du Minotaure', 'J. M. W. Turner', 173, 241],
   ['leonidas', 'Léonidas aux Thermopyles', 'Jacques-Louis David', 395, 531],
-  ['smalah', 'Prise de la smalah d’Abd-el-Kader', 'Horace Vernet', 489, 2139],
   ['femmesalger', 'Femmes d’Alger dans leur appartement', 'Eugène Delacroix', 180, 229],
   ['marcaurele', 'Dernières paroles de l’empereur Marc Aurèle', 'Eugène Delacroix', 256, 337.5],
   ['sanadrian', 'Portrait du marquis de San Adrián', 'Francisco de Goya', 209, 127],
   ['rochejaquelein', 'Henri de La Rochejaquelein', 'Pierre-Narcisse Guérin', 216, 142],
   ['gonzague', 'Consécration de saint Louis de Gonzague', 'Francisco de Goya', 200, 130, 1],
+  ['fontaine', 'Une femme et deux enfants à la fontaine', 'Francisco de Goya', 87, 115, 1],
+  ['drapeaux', 'Les Drapeaux', 'Léon Cogniet', 60, 80, 1],
+  ['ermita', 'La ermita de San Isidro', 'Francisco de Goya', 42, 44]],
+ '8b': [
+  ['minotaure', 'Le Naufrage du Minotaure', 'J. M. W. Turner', 173, 241],
+  ['smalah', 'Prise de la smalah d’Abd-el-Kader', 'Horace Vernet', 489, 2139],
   ['falstaff', 'Falstaff dans la corbeille à linge', 'Johann Heinrich Füssli', 137, 170],
   ['pecheurs', 'Pêcheurs en mer', 'J. M. W. Turner', 91.4, 122.2],
   ['leversoleil', 'Lever de soleil avec monstres marins', 'J. M. W. Turner', 91.4, 121.9],
-  ['fontaine', 'Une femme et deux enfants à la fontaine', 'Francisco de Goya', 87, 115, 1],
-  ['drapeaux', 'Les Drapeaux', 'Léon Cogniet', 60, 80, 1],
-  ['ermita', 'La ermita de San Isidro', 'Francisco de Goya', 42, 44],
   ['soirnuages', 'Soir avec nuages', 'Caspar David Friedrich', 22, 30, 1],
   ['friedsoleil', 'Femme devant le coucher de soleil', 'Caspar David Friedrich', 22, 30]],
  9: [
@@ -502,7 +503,7 @@ function subtract(a, b, cuts){
   for (const [c0, c1] of cuts || []){ const nr = []; for (const [s, e] of res){ if (c1 <= s || c0 >= e){ nr.push([s, e]); continue; } if (c0 > s) nr.push([s, c0]); if (c1 < e) nr.push([c1, e]); } res = nr; }
   return res.filter(([s, e]) => e - s > .01);
 }
-const HANG = {}, ROOMH = {}, RECTS = [];
+const HANG = {}, ROOMH = {}, RECTS = [], FLOORY = {'8b': 5.4}, PLAT = [];
 function lineSeg(room, x1, z1, x2, z2, nx, nz){
   const L = Math.hypot(x2-x1, z2-z1); if (L < .6) return;
   (HANG[room] = HANG[room] || []).push({len: L, at: s => ({x: x1 + (x2-x1)*s/L, z: z1 + (z2-z1)*s/L, nx, nz})});
@@ -535,7 +536,7 @@ rectRoom(3, 25, 27, 32, 35, {doors: {W: [[30.1, 31.9]], E: [[30.1, 31.9]]}, keep
 rectRoom(4, 33, 29, 44, 33, {h: 7, doors: {W: [[30.1, 31.9]], N: [[42.2, 43.8]]}, keep: {N: [[40.5, 42.2]]}});
 rectRoom(5, 34, 20, 44, 28, {h: 5.4, doors: {S: [[42.2, 43.8]], N: [[38.1, 39.9]]}, keep: {N: [[39.9, 41.6]]}});
 rectRoom(6, 34, 11, 44, 19, {doors: {S: [[38.1, 39.9]], N: [[36.1, 37.9]]}, keep: {N: [[37.9, 39.6]]}});
-rectRoom(8, 9.3, 18.5, 32, 26, {h: 6.4, doors: {N: [[11, 13]], E: [[19, 20.8]]}, keep: {W: [[20.6, 23.9]], N: [[13, 15]]}});
+rectRoom(8, 9.3, 18.5, 32, 26, {h: 5.4, doors: {N: [[11, 13]], E: [[19, 20.8]]}, keep: {W: [[20.6, 23.9]], N: [[13, 15]], S: [[25.6, 32]], E: [[23.0, 26]]}});
 rectRoom(9, 10, 11, 32, 17.5, {doors: {S: [[11, 13]], N: [[16.1, 17.9]]}, keep: {N: [[17.9, 19.8]]}});
 rectRoom(11, 1, 1, 11, 9, {doors: {E: [[4, 6]], S: [[4, 8]]}, keep: {S: [[8, 9.6]]}});
 rectRoom('c', 4, 9, 8, 15, {doors: {N: [[4, 8]], S: [[4, 8]]}});
@@ -613,13 +614,52 @@ pair([13, 37.2], [13, 38.8], [14, 37.2], [14, 38.8]);
   const c = new THREE.Mesh(new THREE.PlaneGeometry(11, 4), new THREE.MeshBasicMaterial({map: tex, side: THREE.DoubleSide})); c.rotation.x = Math.PI/2; c.position.set(38.5, 6.95, 31); scene.add(c);
 }
 
+/* ---------- salle 8 : étage et escalier ---------- */
+const F8 = {x0: 9.3, x1: 32, z0: 18.5, z1: 26, y: 5.4, h: 6.6}; ROOMH['8b'] = F8.h;
+mats['8b'] = lam(0x3f5f6c);
+PLAT.push({x0: 9.3, x1: 26.0, z0: 18.5, z1: 26, y: F8.y}, {x0: 26.0, x1: 32, z0: 18.5, z1: 23.3, y: F8.y}, {x0: 26.0, x1: 26.3, z0: 23.3, z1: 24.6, y: F8.y});
+{
+  const top = F8.y + F8.h, hh = top - F8.y;
+  for (const [x1, z1, x2, z2] of [[F8.x0, F8.z0, F8.x1, F8.z0], [F8.x1, F8.z0, F8.x1, F8.z1], [F8.x1, F8.z1, F8.x0, F8.z1], [F8.x0, F8.z1, F8.x0, F8.z0]]){
+    const L = Math.hypot(x2 - x1, z2 - z1), m = new THREE.Mesh(new THREE.BoxGeometry(L + .2, hh, .2), mats['8b']);
+    m.position.set((x1 + x2)/2, F8.y + hh/2, (z1 + z2)/2); m.rotation.y = -Math.atan2(z2 - z1, x2 - x1); scene.add(m); walls.push(m);
+  }
+  // murs de l'étage pour les passages du rez-de-chaussée, garde-corps
+  segs.push([11, 18.5, 13, 18.5, 4, 99], [32, 19, 32, 20.8, 4, 99], [26.3, 23.3, 32, 23.3, 2.5, 99], [26.0, 24.6, 26.0, 26, 4, 99], [26.0, 24.6, 26.3, 24.6, 4, 99]);
+  // plancher de l'étage (dessus parquet)
+  const pq = new THREE.MeshLambertMaterial({map: parquet});
+  for (const p of PLAT){ const w = p.x1 - p.x0, d = p.z1 - p.z0, t = parquet.clone(); t.needsUpdate = true; t.repeat.set(w/4, d/4);
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshLambertMaterial({map: t})); m.rotation.x = -Math.PI/2; m.position.set((p.x0 + p.x1)/2, p.y + .012, (p.z0 + p.z1)/2); scene.add(m);
+    const sl = new THREE.Mesh(new THREE.BoxGeometry(w, .3, d), lam(0xf1ece2)); sl.position.set((p.x0 + p.x1)/2, p.y - .155, (p.z0 + p.z1)/2); scene.add(sl); }
+  // escalier en U (marches de 20 cm)
+  const stone = lam(0xd9cfbf), edge = lam(0xa89a84);
+  const step = (cx, cz, hw, hd, t) => { const b = new THREE.Mesh(new THREE.BoxGeometry(hw*2, t, hd*2), stone); b.position.set(cx, t/2, cz); scene.add(b); const n = new THREE.Mesh(new THREE.BoxGeometry(hw*2 + .01, .02, hd*2 + .01), edge); n.position.set(cx, t - .01, cz); scene.add(n); solid(cx, cz, hw, hd, 0, t); };
+  for (let i = 0; i < 13; i++) step(26.0 + .3*i + .15, 25.275, .15, .625, .2*(i + 1));
+  step(30.875, 24.6, .975, 1.3, 2.8);
+  for (let k = 0; k < 12; k++) step(29.9 - .3*k - .15, 23.975, .15, .625, 3.0 + .2*k);
+  // garde-corps dorés
+  const brass = lam(0xb8923e);
+  const rail = (x1, y1, z1, x2, y2, z2) => { const L = Math.hypot(x2 - x1, y2 - y1, z2 - z1), m = new THREE.Mesh(new THREE.CylinderGeometry(.025, .025, L, 8), brass); m.position.set((x1 + x2)/2, (y1 + y2)/2, (z1 + z2)/2); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(x2 - x1, y2 - y1, z2 - z1).normalize()); scene.add(m); };
+  const post = (x, y, z) => rail(x, y, z, x, y + .95, z);
+  for (let k = 0; k <= 12; k++){ const x = 29.9 - .3*k, y = k < 12 ? 3.0 + .2*k : F8.y; post(x, k ? y - .2 : 2.8, 23.33); }
+  rail(29.9, 2.8 + .95, 23.33, 26.3, 5.2 + .95, 23.33); rail(31.85, 2.8 + .95, 23.33, 29.9, 2.8 + .95, 23.33); post(31.85, 2.8, 23.33);
+  rail(26.3, F8.y + .95, 23.31, 32, F8.y + .95, 23.31); for (let x = 26.3; x < 32; x += .6) post(x, F8.y, 23.31);
+  rail(26.0, F8.y + .95, 24.6, 26.0, F8.y + .95, 26); rail(26.0, F8.y + .95, 24.6, 26.3, F8.y + .95, 24.6); for (let z = 24.6; z < 26; z += .5) post(26.0, F8.y, z);
+  // cimaises de l'étage
+  const m = .35;
+  lineSeg('8b', F8.x0 + m, F8.z0, F8.x1 - m, F8.z0, 0, 1);
+  lineSeg('8b', 25.4, F8.z1, F8.x0 + m, F8.z1, 0, -1);
+  lineSeg('8b', F8.x0, F8.z1 - m, F8.x0, F8.z0 + m, 1, 0);
+  lineSeg('8b', F8.x1, F8.z0 + m, F8.x1, 22.9, -1, 0);
+}
 /* ---------- accrochage à taille réelle ---------- */
 function hangWork(a, x, z, nx, nz, room){
   const roomH = ROOMH[room] || H, w = a.w/100*(a.scale || 1), h = a.h/100*(a.scale || 1);
   const cwP = Math.max(.42, Math.min(.8, w*.6)), chP = cwP*200/512, bP = Math.min(.2, .06 + Math.max(w, h)*.03) + .022;
   let cy = Math.max(1.62, h/2 + .78, h/2 + bP + .06 + chP + .28); if (cy + h/2 > roomH - .25) cy = Math.max(h/2 + .3, roomH - .25 - h/2);
   const o = .19, phi = Math.atan2(nx, nz);
-  const g = new THREE.Group(); g.position.set(x + nx*o, cy, z + nz*o); g.rotation.y = phi;
+  const base = FLOORY[room] || 0;
+  const g = new THREE.Group(); g.position.set(x + nx*o, cy + base, z + nz*o); g.rotation.y = phi;
   const border = frame(g, w, h);
   let mat;
   if (a.src){ const tex = loader.load(a.src); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = renderer.capabilities.getMaxAnisotropy ? Math.min(16, renderer.capabilities.getMaxAnisotropy()) : 4; mat = new THREE.MeshBasicMaterial({map: tex}); }
@@ -631,7 +671,7 @@ function hangWork(a, x, z, nx, nz, room){
   let cyl = -h/2 - border - .06 - ch/2;
   if (cy + cyl - ch/2 < .2) c.position.set(w/2 + border + .08 + cw/2, -h/2 + ch/2, -.05); else c.position.set(0, cyl, -.05);
   g.add(c); scene.add(g); paintGroups.push(g);
-  hung.push({key: a.key, x: x + nx*o, z: z + nz*o, nx, nz, w, h, cy, room: String(room)});
+  hung.push({key: a.key, x: x + nx*o, z: z + nz*o, nx, nz, w, h, cy: cy + base, y: base, room: String(room)});
 }
 function hangRoom(room, keep){
   const list = ALL.filter(a => a.room === String(room)), S = (HANG[room] || []).map(s => ({s, rem: s.len, items: []}));
@@ -647,19 +687,20 @@ function hangRoom(room, keep){
   for (const sg of S){
     if (!sg.items.length) continue;
     if (keep) sg.items.sort((p, q) => list.indexOf(p) - list.indexOf(q));
-    else if (String(room) === '8'){ let seed = 8 + sg.items.length*31; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647; const arr = sg.items.slice().sort((p, q) => list.indexOf(p) - list.indexOf(q)); for (let i = arr.length - 1; i > 0; i--){ const j = Math.floor(rnd()*(i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } sg.items = arr; }
+    else if (String(room)[0] === '8'){ let seed = 8 + sg.items.length*31; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647; const arr = sg.items.slice().sort((p, q) => list.indexOf(p) - list.indexOf(q)); for (let i = arr.length - 1; i > 0; i--){ const j = Math.floor(rnd()*(i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } sg.items = arr; }
     else { const by = sg.items.slice().sort((p, q) => q.w*q.h - p.w*p.h), arr = []; by.forEach((a, i) => i % 2 ? arr.unshift(a) : arr.push(a)); if (String(room) === 'A') arr.reverse(); sg.items = arr; }
     const tot = sg.items.reduce((t, a) => t + a.w/100*(a.scale || 1), 0), gap = (sg.s.len - tot)/(sg.items.length + 1);
     let s = gap;
     for (const a of sg.items){ const w = a.w/100*(a.scale || 1), p = sg.s.at(s + w/2); hangWork(a, p.x, p.z, p.nx, p.nz, room); s += w + gap; }
   }
 }
-[1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 'c', 12, 'A'].forEach(r => hangRoom(r));
+[1, 2, 3, 4, 5, 6, 7, 8, '8b', 9, 11, 'c', 12, 'A'].forEach(r => hangRoom(r));
 hangRoom(10, true);
 
 /* ---------- où suis-je ? ---------- */
-const ROOMS = {W: ['Faille spatiale', 'Couloir de l’hyperespace'], E: ['Entrée', 'Accueil du musée'], 1: ['Salle 1', 'Antiquité et Orient'], 2: ['Salle 2', 'Gothique et première Renaissance'], 3: ['Salle 3', 'Renaissance florentine'], 4: ['Salle 4', 'La Sixtine'], 5: ['Salle 5', 'Venise et maniérisme'], 6: ['Salle 6', 'Le Grand Siècle'], 7: ['Salle 7', 'Lumières et rococo'], 8: ['Salle 8', 'Romantisme et orientalisme'], 9: ['Salle 9', 'Réalisme et symbolisme'], 10: ['Salle 10', 'Impressionnisme'], 11: ['Salle 11', 'Post-impressionnisme'], c: ['Couloir', 'Couloir de l’amitié'], 12: ['Salle 12', 'Fauvisme et modernités'], A: ['Archives', 'Œuvres disparues et archives'], K: ['Salle de concert', 'Nodí tri · Kuatu Kadéra'], P: ['Terrain de sport', 'Le foot du musée'], S: ['Salle secrète', 'Home cinéma'], p: ['Passage', 'Entre deux salles']};
-function roomAt(x, z){
+const ROOMS = {W: ['Faille spatiale', 'Couloir de l’hyperespace'], E: ['Entrée', 'Accueil du musée'], 1: ['Salle 1', 'Antiquité et Orient'], 2: ['Salle 2', 'Gothique et première Renaissance'], 3: ['Salle 3', 'Renaissance florentine'], 4: ['Salle 4', 'La Sixtine'], 5: ['Salle 5', 'Venise et maniérisme'], 6: ['Salle 6', 'Le Grand Siècle'], 7: ['Salle 7', 'Lumières et rococo'], 8: ['Salle 8', 'Romantisme et orientalisme'], 9: ['Salle 9', 'Réalisme et symbolisme'], 10: ['Salle 10', 'Impressionnisme'], 11: ['Salle 11', 'Post-impressionnisme'], c: ['Couloir', 'Couloir de l’amitié'], 12: ['Salle 12', 'Fauvisme et modernités'], A: ['Archives', 'Œuvres disparues et archives'], K: ['Salle de concert', 'Nodí tri · Kuatu Kadéra'], P: ['Terrain de sport', 'Le foot du musée'], '8b': ['Salle 8 · étage', 'Paysages romantiques et la Smalah'], S: ['Salle secrète', 'Home cinéma'], p: ['Passage', 'Entre deux salles']};
+function roomAt(x, z, y){
+  if (y > 2.6 && x > F8.x0 && x < F8.x1 && z > F8.z0 && z < F8.z1) return '8b';
   if (x > 32.05 && x < 33.95 && z > 9.2 && z < 21.6) return 'W';
   if (((x-CX)/RX)**2 + ((z-CZ)/RZ)**2 < 1) return '10';
   if (Math.hypot(x - OC.x, z - OC.z) < 4.6) return '7';
@@ -842,10 +883,10 @@ function walker(path, skin, speed){
   guards.push({p, sit: false, path, i: 1, x: path[0][0], z: path[0][1], yaw: 0, speed, phase: 0, pause: 0, t: 0});
 }
 seated(14.7, 6.9, 22, 5, 0); seated(1.65, 4.9, 6, 4.9, 2); seated(8.3, 15.8, 4.5, 19, 1);
-seated(15.3, 27.7, 13, 31, 3); seated(34.7, 27.3, 39, 24, 0); seated(31.3, 25.3, 20.6, 22.25, 2); seated(31.3, 34.3, 28.5, 31, 1);
+seated(15.3, 27.7, 13, 31, 3); seated(34.7, 27.3, 39, 24, 0); seated(31.4, 22.3, 20.6, 22.25, 2); seated(31.3, 34.3, 28.5, 31, 1);
 walker(Array.from({length: 14}, (_, i) => { const t = i/14*2*Math.PI; return [CX + 5.6*Math.cos(t), CZ + 2.5*Math.sin(t)]; }), 3, .75);
 walker([[9.5,5],[3,5],[3,7.5],[6,7.5],[6,13],[4.5,17.6],[2,17.6],[2,21.3],[7,21.3],[7,17.6],[4.5,17.6],[6,13],[6,7.5],[9.5,7.5]], 1, .9);
-walker([[16,20.6],[31,20.6],[31,24.2],[16,24.2]], 2, .8);
+walker([[16,20.6],[25,20.6],[25,23.6],[16,23.6]], 2, .8);
 
 const skinA = lam(0xc68863), skinB = lam(0xe0b08a), skinC = lam(0x9a6644), skinD = lam(0xf0c8a4);
 function texMat(w, h, draw){ return new THREE.MeshLambertMaterial({map: canvasTex(w, h, draw)}); }
@@ -1501,16 +1542,16 @@ function setTag(on){ tagMode = on; $('bTag').setAttribute('aria-pressed', on); r
 
 /* ---------- visite guidée ---------- */
 const stops = [];
-function way(x, z, lx, lz, hold){ stops.push({x, z, yaw: yawTo(lx - x, lz - z), pitch: 0, hold: hold || 0}); }
-const DMAX = {1: 2.7, 2: 3.2, 3: 3.2, 4: 1.75, 5: 3.7, 6: 3.7, 7: 3.3, 8: 5.6, 9: 4.7, 10: 3.4, 11: 3.7, c: 1.8, 12: 3.7, A: 1.0};
+function way(x, z, lx, lz, hold, y){ stops.push({x, z, yaw: yawTo(lx - x, lz - z), pitch: 0, hold: hold || 0, y: y || 0}); }
+const DMAX = {'8b': 5.6, 1: 2.7, 2: 3.2, 3: 3.2, 4: 1.75, 5: 3.7, 6: 3.7, 7: 3.3, 8: 5.6, 9: 4.7, 10: 3.4, 11: 3.7, c: 1.8, 12: 3.7, A: 1.0};
 function viewArt(p){
   const d = Math.min(DMAX[p.room] || 3, Math.max(1.5, .8 + Math.max(p.w, p.h)*1.05));
-  stops.push({x: p.x + p.nx*d, z: p.z + p.nz*d, yaw: yawTo(-p.nx, -p.nz), pitch: Math.max(-.3, Math.min(.5, Math.atan2(p.cy - EYE, d))), hold: 2.6 + Math.min(2, p.w*.5), art: p.key});
+  stops.push({x: p.x + p.nx*d, z: p.z + p.nz*d, y: p.y || 0, yaw: yawTo(-p.nx, -p.nz), pitch: Math.max(-.3, Math.min(.5, Math.atan2(p.cy - (p.y || 0) - EYE, d))), hold: 2.6 + Math.min(2, p.w*.5), art: p.key});
 }
-const LINK = {'E-1': [[8.0, 31], [11, 31]], '1-2': [[15.4, 31], [17.6, 31]], '2-3': [[23.4, 31], [25.6, 31]], '3-4': [[31.4, 31], [33.6, 31]], '4-5': [[43, 29.7], [43, 27.3]], '5-6': [[39, 20.7], [39, 18.3]], '6-7': [[37, 11.7], [37, 9.0]], '7-8': [[35.2, 7.0], [33.75, 8.6], [33, 11.6], [33, 19.9], [31.2, 19.9]], '8-9': [[12, 19.3], [12, 16.7]], '9-10': [[17, 11.7], [17, 8.0]], '10-11': [[14.0, 5], [10.3, 5]], '11-c': [[6, 8.3], [6, 9.7]], 'c-12': [[6, 14.3], [6, 15.7]], '12-A': [[7.1, 22.3], [7.1, 24.6]], 'A-E': [[4.5, 25.3], [4.5, 28]], 'E-K': [[4.5, 34], [4.5, 37.3]], 'K-P': [[12.3, 38], [14.8, 38]]};
-function link(k){ const P = LINK[k]; for (let i = 0; i < P.length; i++){ const a = P[i], b = P[i+1] || [a[0] + (a[0] - P[i-1][0]), a[1] + (a[1] - P[i-1][1])]; way(a[0], a[1], b[0], b[1]); } }
+const LINK = {'E-1': [[8.0, 31], [11, 31]], '1-2': [[15.4, 31], [17.6, 31]], '2-3': [[23.4, 31], [25.6, 31]], '3-4': [[31.4, 31], [33.6, 31]], '4-5': [[43, 29.7], [43, 27.3]], '5-6': [[39, 20.7], [39, 18.3]], '6-7': [[37, 11.7], [37, 9.0]], '7-8': [[35.2, 7.0], [33.75, 8.6], [33, 11.6], [33, 19.9], [31.2, 19.9]], '8-8b': [[24.4, 25.27, 0], [26.0, 25.27, 0], [29.9, 25.27, 2.6], [31.0, 24.6, 2.8], [29.9, 23.97, 2.8], [26.3, 23.97, 5.2], [25.2, 23.97, 5.4], [23.5, 22.2, 5.4]], '8b-9': [[25.2, 23.97, 5.4], [26.3, 23.97, 5.2], [29.9, 23.97, 2.8], [31.0, 24.6, 2.8], [29.9, 25.27, 2.6], [26.0, 25.27, 0], [24.4, 25.27, 0], [12, 19.3, 0], [12, 16.7, 0]], '9-10': [[17, 11.7], [17, 8.0]], '10-11': [[14.0, 5], [10.3, 5]], '11-c': [[6, 8.3], [6, 9.7]], 'c-12': [[6, 14.3], [6, 15.7]], '12-A': [[7.1, 22.3], [7.1, 24.6]], 'A-E': [[4.5, 25.3], [4.5, 28]], 'E-K': [[4.5, 34], [4.5, 37.3]], 'K-P': [[12.3, 38], [14.8, 38]]};
+function link(k){ const P = LINK[k]; for (let i = 0; i < P.length; i++){ const a = P[i], b = P[i+1] || [a[0] + (a[0] - P[i-1][0]), a[1] + (a[1] - P[i-1][1])]; way(a[0], a[1], b[0], b[1], 0, a[2]); } }
 stops.push({x: EC.x + .6, z: EC.z, yaw: yawTo(-1, 0), pitch: .3, hold: 3.2}); way(EC.x, EC.z, 10, 31, .3);
-const ORDER = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', 'c', '12', 'A'];
+const ORDER = ['1', '2', '3', '4', '5', '6', '7', '8', '8b', '9', '10', '11', 'c', '12', 'A'];
 let prev = 'E';
 for (const r of ORDER){
   link(prev + '-' + r);
@@ -1535,7 +1576,7 @@ function tourStep(dt){
   if (holding){ holdT += dt; if (holdT >= stops[seg].hold){ holding = false; holdT = 0; } return; }
   const a = stops[seg], b = stops[seg+1], d = reduce ? .001 : segDur(a, b);
   segT += dt*(1 + 2*warp); const t = Math.min(1, segT / d), e = ease(t);
-  pos.x = a.x + (b.x - a.x)*e; pos.z = a.z + (b.z - a.z)*e; pos.yaw = a.yaw + angDiff(a.yaw, b.yaw)*e; pos.pitch = a.pitch + (b.pitch - a.pitch)*e;
+  pos.x = a.x + (b.x - a.x)*e; pos.z = a.z + (b.z - a.z)*e; pos.y = (a.y || 0) + ((b.y || 0) - (a.y || 0))*e; pos.yaw = a.yaw + angDiff(a.yaw, b.yaw)*e; pos.pitch = a.pitch + (b.pitch - a.pitch)*e;
   if (t >= 1){
     seg++; segT = 0; const s = stops[seg];
     if (s.hold) holding = true;
@@ -1547,9 +1588,9 @@ function skip(){
   holding = false; holdT = 0;
   let n = seg + 1; while (n < stops.length - 1 && !stops[n].art) n++;
   seg = Math.max(0, n - 1); segT = 0;
-  const s = stops[seg]; Object.assign(pos, {x: s.x, z: s.z, yaw: s.yaw, pitch: s.pitch});
+  const s = stops[seg]; Object.assign(pos, {x: s.x, z: s.z, y: s.y || 0, yaw: s.yaw, pitch: s.pitch});
 }
-function restart(){ seg = 0; segT = 0; holding = false; const s = stops[0]; Object.assign(pos, {x: s.x, z: s.z, yaw: s.yaw, pitch: 0}); $('prog').style.width = '0'; }
+function restart(){ seg = 0; segT = 0; holding = false; const s = stops[0]; Object.assign(pos, {x: s.x, z: s.z, y: 0, yaw: s.yaw, pitch: 0}); $('prog').style.width = '0'; }
 
 /* ---------- promenade libre ---------- */
 const keys = {};
@@ -1601,14 +1642,16 @@ $('bAct').onclick = doAction;
 const PR = .3;
 function collide(){
   for (let it = 0; it < 3; it++){
-    for (const [x1, z1, x2, z2] of segs){
+    for (const sg of segs){
+      if (sg.length > 4 && (pos.y < sg[4] || pos.y > sg[5])) continue;
+      const [x1, z1, x2, z2] = sg;
       const ex = x2 - x1, ez = z2 - z1, L2 = ex*ex + ez*ez;
       const t = Math.max(0, Math.min(1, ((pos.x - x1)*ex + (pos.z - z1)*ez) / L2));
       const qx = x1 + ex*t, qz = z1 + ez*t, dx = pos.x - qx, dz = pos.z - qz, d = Math.hypot(dx, dz), m = PR + .1;
       if (d < m && d > 1e-6){ pos.x = qx + dx/d*m; pos.z = qz + dz/d*m; }
     }
     for (const b of solids){
-      if (pos.y >= b.top - .14) continue;
+      if (pos.y >= b.top - .22) continue;
       const dx = pos.x - b.cx, dz = pos.z - b.cz, lx = dx*b.c - dz*b.s, lz = dx*b.s + dz*b.c;
       const qx = Math.max(-b.hw, Math.min(b.hw, lx)), qz = Math.max(-b.hd, Math.min(b.hd, lz));
       let px = lx - qx, pz = lz - qz; const d = Math.hypot(px, pz);
@@ -1623,8 +1666,9 @@ function groundAt(){
   let g = 0;
   for (const b of solids){
     const dx = pos.x - b.cx, dz = pos.z - b.cz, lx = dx*b.c - dz*b.s, lz = dx*b.s + dz*b.c;
-    if (Math.abs(lx) <= b.hw + .1 && Math.abs(lz) <= b.hd + .1 && pos.y >= b.top - .14) g = Math.max(g, b.top);
+    if (Math.abs(lx) <= b.hw + .1 && Math.abs(lz) <= b.hd + .1 && pos.y >= b.top - .22) g = Math.max(g, b.top);
   }
+  for (const p of PLAT) if (pos.x >= p.x0 && pos.x <= p.x1 && pos.z >= p.z0 && pos.z <= p.z1 && pos.y >= p.y - .22) g = Math.max(g, p.y);
   return g;
 }
 let lastAct = undefined;
@@ -1645,7 +1689,7 @@ function setMode(m){
   mode = m;
   $('bTour').setAttribute('aria-pressed', m === 'tour'); $('bFree').setAttribute('aria-pressed', m === 'free');
   $('pad').hidden = $('help').hidden = m !== 'free'; $('progWrap').hidden = m !== 'tour';
-  if (m === 'tour'){ sitting = null; unlock(); setTag(false); look.yaw = look.pitch = 0; pos.y = 0; pos.vy = 0; clearTimeout(sayTimer); setCartel(null); if (seg >= stops.length - 1) restart(); else { const s = stops[seg]; Object.assign(pos, {x: s.x, z: s.z, yaw: s.yaw, pitch: s.pitch}); segT = 0; holding = !!s.hold; } }
+  if (m === 'tour'){ sitting = null; unlock(); setTag(false); look.yaw = look.pitch = 0; pos.vy = 0; clearTimeout(sayTimer); setCartel(null); if (seg >= stops.length - 1) restart(); else { const s = stops[seg]; Object.assign(pos, {x: s.x, z: s.z, y: s.y || 0, yaw: s.yaw, pitch: s.pitch}); segT = 0; holding = !!s.hold; } }
   else { lastAct = undefined; setCartel(null); }
 }
 $('bTour').onclick = () => setMode('tour');
@@ -1839,7 +1883,7 @@ function updateBirds(){
   }
   for (const r of RECTS){
     if (r.id === 'S' || r.id === 4) continue;
-    const y = ROOMH[r.id] || H, W = r.x1 - r.x0, D = r.z1 - r.z0, along = W >= D, L = along ? W : D, Sh = along ? D : W;
+    const y = r.id === 8 ? F8.y + F8.h : (ROOMH[r.id] || H), W = r.x1 - r.x0, D = r.z1 - r.z0, along = W >= D, L = along ? W : D, Sh = along ? D : W;
     const n = Math.max(1, Math.round(L/(Sh*1.25))), wells = [];
     for (let k = 0; k < n; k++){ const c = (k + .5)/n, ww = L/n*.5, dd = Sh*.42; wells.push(along ? [r.x0 + W*c, (r.z0 + r.z1)/2, ww, dd] : [(r.x0 + r.x1)/2, r.z0 + D*c, dd, ww]); }
     ceilingWithWells(r.x0 - .1, r.z0 - .1, r.x1 + .1, r.z1 + .1, y - .005, wells);
@@ -1887,7 +1931,7 @@ function tick(now){
   if (mode === 'tour' && !drag){ look.idle += dt; if (look.idle > 1.6){ const k = Math.min(1, dt*2.5); look.yaw -= look.yaw*k; look.pitch -= look.pitch*k; } }
   const lt = mode === 'tour';
   cam.position.set(pos.x, EYE + pos.y, pos.z); cam.rotation.set(pos.pitch + (lt ? look.pitch : 0), pos.yaw + (lt ? look.yaw : 0), 0);
-  setRoom(roomAt(pos.x, pos.z));
+  setRoom(roomAt(pos.x, pos.z, pos.y));
   renderer.render(scene, cam);
   requestAnimationFrame(tick);
 }
