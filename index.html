@@ -103,7 +103,9 @@ button:focus-visible{outline:2px solid var(--gilt);outline-offset:2px}
     <button id="bAct" class="txt" hidden>Tirer</button>
   </div>
   <aside class="keys" id="keys" aria-label="Touches du clavier"><h3>Touches</h3><dl>
-    <dt><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Marcher (ou flèches)</dd>
+    <dt><kbd>Z</kbd><kbd>S</kbd></dt><dd>Avancer / reculer</dd>
+    <dt><kbd>Q</kbd><kbd>D</kbd></dt><dd>Pas de côté gauche / droite</dd>
+    <dt><kbd>←</kbd><kbd>→</kbd></dt><dd>Tourner (sans souris)</dd>
     <dt><kbd>Souris</kbd></dt><dd>Regarder · clic pour piloter, <kbd>Échap</kbd> pour libérer</dd>
     <dt><kbd>Espace</kbd></dt><dd>Sauter</dd>
     <dt><kbd>F</kbd> <kbd>E</kbd></dt><dd>Action : s’asseoir, tirer, lancer, frapper</dd>
@@ -114,7 +116,7 @@ button:focus-visible{outline:2px solid var(--gilt);outline-offset:2px}
     <div class="sep"></div>
     <dt><kbd>H</kbd></dt><dd>Masquer ce panneau</dd>
   </dl></aside>
-  <div class="help" id="help" hidden>Glisse pour regarder · sur ordinateur, clique pour piloter la caméra à la souris (Échap pour libérer) · ZQSD ou flèches pour marcher · Espace pour sauter · T pour taguer · F pour l’action · au concert : C pour applaudir, R pour lancer une rose</div>
+  <div class="help" id="help" hidden>Glisse pour regarder · sur ordinateur, clique pour piloter la caméra à la souris (Échap pour libérer) · ZS pour avancer/reculer, QD pour se décaler, la souris pour regarder · Espace pour sauter · T pour taguer · F pour l’action · au concert : C pour applaudir, R pour lancer une rose</div>
 </div>
 <div id="quiz" hidden>
   <div class="qp" role="dialog" aria-modal="true" aria-labelledby="qQ">
@@ -1151,7 +1153,7 @@ function ballSub(dt){
   if (goalT > 0){ goalT -= dt; if (goalT <= 0) Object.assign(football, {x: 22, y: .11, z: 41.25, vx: 0, vy: 0, vz: 0}); }
   else if (Math.abs(football.z - 41.25) < 1.45 && football.y < 1.55 && (football.x < 14.55 || football.x > 29.45)){ goals++; goalT = 1.6; if (football.by === 'me'){ football.by = null; sportAdd('g'); } if (roomAt(pos.x, pos.z) === 'P') say('BUT !', goals + (goals > 1 ? ' buts marqués' : ' but marqué') + ' au terrain du musée.' + sportTxt('g')); }
   if (basketHeld){
-    const fx = -Math.sin(pos.yaw), fz = -Math.cos(pos.yaw), rx = -fz, rz = fx, mv = keys.fwd || keys.back;
+    const fx = -Math.sin(pos.yaw), fz = -Math.cos(pos.yaw), rx = -fz, rz = fx, mv = keys.fwd || keys.back || keys.sl || keys.sr;
     basketDrib += dt*(mv ? 5.2 : 0);
     const y = mv ? .25 + Math.abs(Math.cos(basketDrib))*.75 : 1.25 + Math.sin(performance.now()/400)*.02;
     Object.assign(basket, {x: pos.x + fx*.45 + rx*(mv ? .22 : 0), y: pos.y + y, z: pos.z + fz*.45 + rz*(mv ? .22 : 0), vx: 0, vy: 0, vz: 0});
@@ -1620,7 +1622,7 @@ function restart(){ seg = 0; segT = 0; holding = false; const s = stops[0]; Obje
 
 /* ---------- promenade libre ---------- */
 const keys = {};
-const KEYMAP = {Space: 'jump', ArrowUp: 'fwd', KeyW: 'fwd', KeyZ: 'fwd', ArrowDown: 'back', KeyS: 'back', ArrowLeft: 'left', KeyA: 'left', KeyQ: 'left', ArrowRight: 'right', KeyD: 'right'};
+const KEYMAP = {Space: 'jump', ArrowUp: 'fwd', KeyW: 'fwd', KeyZ: 'fwd', ArrowDown: 'back', KeyS: 'back', ArrowLeft: 'left', KeyA: 'sl', KeyQ: 'sl', ArrowRight: 'right', KeyD: 'sr'};
 addEventListener('keydown', e => {
   if (quizOpen) return;
   if ((e.code === 'KeyF' || e.code === 'KeyE') && !e.repeat){ doAction(); return; }
@@ -1701,10 +1703,12 @@ let lastAct = undefined;
 function freeStep(dt){
   if (dancing) return;
   if (keys.left) pos.yaw += dt * 1.4; if (keys.right) pos.yaw -= dt * 1.4;
-  if (sitting){ if (keys.fwd || keys.back || keys.jump){ standUp(); keys.jump = false; } else { const a = actionTarget(); if (a !== lastAct){ lastAct = a; $('bAct').hidden = !a; if (a) $('bAct').textContent = a; } return; } }
+  if (sitting){ if (keys.fwd || keys.back || keys.sl || keys.sr || keys.jump){ standUp(); keys.jump = false; } else { const a = actionTarget(); if (a !== lastAct){ lastAct = a; $('bAct').hidden = !a; if (a) $('bAct').textContent = a; } return; } }
   const v = (keys.fwd ? 1 : 0) - (keys.back ? 1 : 0);
   const sp = 2.4*(1 + 2.6*warp);
-  if (v){ pos.x = Math.max(-9.5, Math.min(46, pos.x - Math.sin(pos.yaw)*v*dt*sp)); pos.z = Math.max(-2, Math.min(47, pos.z - Math.cos(pos.yaw)*v*dt*sp)); }
+  const st = (keys.sr ? 1 : 0) - (keys.sl ? 1 : 0);
+  if (v || st){ const n = Math.hypot(v, st), mx = (-Math.sin(pos.yaw)*v + Math.cos(pos.yaw)*st)/n, mz = (-Math.cos(pos.yaw)*v - Math.sin(pos.yaw)*st)/n;
+    pos.x = Math.max(-9.5, Math.min(46, pos.x + mx*dt*sp)); pos.z = Math.max(-2, Math.min(47, pos.z + mz*dt*sp)); }
   collide();
   const gnd = groundAt();
   if (keys.jump && pos.y <= gnd + .001) pos.vy = 4.3;
