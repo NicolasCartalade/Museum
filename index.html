@@ -2203,7 +2203,13 @@ function danceCam(dt){
   camAng += dt*.18;
   const cx = (ana.g.position.x + me.g.position.x)/2, cz = (ana.g.position.z + me.g.position.z)/2;
   const R = 3.4 + Math.sin(danceT*.3)*.6, h = F8.y + 1.9 + Math.sin(danceT*.23)*.4;
-  _camTo.set(cx + Math.sin(camAng)*R, h, cz + Math.cos(camAng)*R);
+  // rayon raccourci pour que la caméra reste dans la salle (marge de 35 cm)
+  const sx = Math.sin(camAng), sz = Math.cos(camAng), M = .35;
+  let Rm = R;
+  if (sx > 0) Rm = Math.min(Rm, (F8.x1 - M - cx)/sx); else if (sx < 0) Rm = Math.min(Rm, (F8.x0 + M - cx)/sx);
+  if (sz > 0) Rm = Math.min(Rm, (F8.z1 - M - cz)/sz); else if (sz < 0) Rm = Math.min(Rm, (F8.z0 + M - cz)/sz);
+  Rm = Math.max(1.2, Rm);
+  _camTo.set(Math.max(F8.x0 + M, Math.min(F8.x1 - M, cx + sx*Rm)), Math.min(F8.y + F8.h - .4, h + (R - Rm)*.35), Math.max(F8.z0 + M, Math.min(F8.z1 - M, cz + sz*Rm)));
   _camFrom.set(pos.x, EYE + pos.y, pos.z);
   cam.position.lerpVectors(_camFrom, _camTo, e);
   if (e > 0.001){ _look.set(cx, F8.y + 1.1, cz); const q0 = cam.quaternion.clone(); cam.lookAt(_look); const q1 = cam.quaternion.clone(); cam.quaternion.copy(q0).slerp(q1, e); }
