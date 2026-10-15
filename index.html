@@ -1687,6 +1687,7 @@ function groundAt(){
 }
 let lastAct = undefined;
 function freeStep(dt){
+  if (dancing) return;
   if (keys.left) pos.yaw += dt * 1.4; if (keys.right) pos.yaw -= dt * 1.4;
   if (sitting){ if (keys.fwd || keys.back || keys.jump){ standUp(); keys.jump = false; } else { const a = actionTarget(); if (a !== lastAct){ lastAct = a; $('bAct').hidden = !a; if (a) $('bAct').textContent = a; } return; } }
   const v = (keys.fwd ? 1 : 0) - (keys.back ? 1 : 0);
@@ -2103,17 +2104,129 @@ function updateTrap(dt){
   if (roomAt(pos.x, pos.z, pos.y) === 'X' && !trapAnnounced){ trapAnnounced = true; if (ballState === 'hidden') say('La crypte de la balle d’or', 'Une balle de ping-pong dorée repose sous une cloche de verre…', 4500); }
 }
 
+/* ---------- Ana, la danseuse de l’étage (salle 8) ---------- */
+const ana = human({name: 'Ana', skin: skinD, hair: 0xe9c46a, longHair: 0xe9c46a, pants: lam(0x9b1b30), sleeve: lam(0x9b1b30), skirt: 0x9b1b30, legs: skinD, torso: shirtMats(0x9b1b30)});
+ana.g.position.set(17.5, F8.y, 22.2); scene.add(ana.g);
+const me = human({name: 'Toi', skin: skinB, hair: 0x2a1b12, pants: lam(0x15151a), sleeve: lam(0xf4f1ea), torso: shirtMats(0xf4f1ea)}); me.g.visible = false; scene.add(me.g);
+const DANCES = {
+  tango: {name: 'Tango', beat: .52},
+  salsa: {name: 'Salsa', beat: .3},
+  valse: {name: 'Valse', beat: .45},
+  rock: {name: 'Rock', beat: .27}
+};
+let danceStyle = 'tango', dancing = false, danceBlend = 0, danceT = 0, camAng = 0;
+const DC = {x: 17.5, z: 22.2}; // centre de la piste
+const couple = {x: 17.5, z: 22.2, dir: 0, spin: 0};
+function clampFloor(c){ c.x = Math.max(11.2, Math.min(24.6, c.x)); c.z = Math.max(19.3, Math.min(25.2, c.z)); }
+// position du centre selon le style (solo ou en couple)
+function danceCenter(t){
+  if (danceStyle === 'tango'){ const L = 5.5, ph = (t/9) % 2, k = ph < 1 ? ph : 2 - ph, e = k*k*(3 - 2*k); return {x: DC.x - L + 2*L*e, z: DC.z + Math.sin(t*.35)*1.6, dir: ph < 1 ? Math.PI/2 : -Math.PI/2}; }
+  if (danceStyle === 'valse'){ const a = t*.38; return {x: DC.x + Math.cos(a)*4.2, z: DC.z + Math.sin(a)*1.9, dir: Math.atan2(-Math.sin(a)*4.2, Math.cos(a)*1.9)}; }
+  if (danceStyle === 'salsa'){ const a = t*.12; return {x: DC.x + Math.cos(a)*2.2, z: DC.z + Math.sin(a*1.3)*1.2, dir: 0}; }
+  const a = t*.25; return {x: DC.x + Math.sin(a)*3.5, z: DC.z + Math.sin(a*2)*1.3, dir: 0};
+}
+function legPose(p, a, b, ka, kb){ p.legs[0].thigh.rotation.x = a; p.legs[1].thigh.rotation.x = b; p.legs[0].shin.rotation.x = ka; p.legs[1].shin.rotation.x = kb; }
+// pose d’un danseur ; mirror = partenaire (jambes inversées)
+function dancePose(p, t, mirror, partnered){
+  const st = DANCES[danceStyle], b = t/st.beat, m = mirror ? -1 : 1;
+  let lift = 0;
+  p.g.rotation.z = 0; p.head.rotation.set(0, 0, 0);
+  if (danceStyle === 'tango'){
+    // lent-lent-vite-vite : pas glissés, tête tranchante
+    const cyc = (b % 6), s = cyc < 2 ? Math.sin(cyc/2*Math.PI) : cyc < 4 ? -Math.sin((cyc - 2)/2*Math.PI) : Math.sin((cyc - 4)*Math.PI);
+    legPose(p, s*.55*m, -s*.55*m, Math.max(0, -s)*.5, Math.max(0, s)*.5);
+    p.head.rotation.y = (Math.floor(b/3) % 2 ? .7 : -.4)*m;
+    p.arms[0].rotation.set(-1.25, 0, .35*m); p.arms[1].rotation.set(-1.0, 0, -.7*m);
+    lift = -.03;
+  } else if (danceStyle === 'salsa'){
+    const s = Math.sin(b*Math.PI), hip = Math.sin(b*Math.PI*.5);
+    legPose(p, s*.35*m, -s*.35*m, Math.max(0, s)*.4, Math.max(0, -s)*.4);
+    p.g.rotation.z = hip*.12; p.head.rotation.y = -hip*.2;
+    const sw = Math.sin(b*Math.PI*.5); p.arms[0].rotation.set(-.9 + sw*.3, 0, .5); p.arms[1].rotation.set(-.9 - sw*.3, 0, -.5);
+    lift = Math.abs(s)*.02;
+  } else if (danceStyle === 'valse'){
+    const k = (b % 3)/3, rise = Math.sin(k*Math.PI);
+    const s = Math.sin(b*Math.PI*2/3);
+    legPose(p, s*.4*m, -s*.4*m, .1, .1);
+    p.arms[0].rotation.set(-1.5, 0, .25*m); p.arms[1].rotation.set(-1.1, 0, -.9*m);
+    p.head.rotation.y = .5*m; lift = rise*.06;
+  } else {
+    const s = Math.sin(b*Math.PI), kick = Math.max(0, Math.sin(b*Math.PI*.5));
+    legPose(p, s*.25 + (Math.floor(b/2) % 2 ? kick*.9 : 0), -s*.25 + (Math.floor(b/2) % 2 ? 0 : kick*.9), .4, .4);
+    p.arms[0].rotation.set(-.6 - Math.abs(s)*.8, 0, .3); p.arms[1].rotation.set(-.6 - Math.abs(s)*.8, 0, -.3);
+    lift = Math.abs(s)*.07;
+  }
+  if (partnered && danceStyle !== 'rock' && danceStyle !== 'salsa'){ p.arms[mirror ? 1 : 0].rotation.set(-1.3, 0, mirror ? -.2 : .2); }
+  return lift;
+}
+function updateDance(dt){
+  danceT += dt;
+  const c = danceCenter(danceT);
+  if (!dancing){
+    // Ana danse seule dans toute la salle
+    let spin = 0; if (danceStyle === 'salsa'){ const k = (danceT % 6)/6; spin = k > .85 ? (k - .85)/.15*Math.PI*2 : 0; }
+    if (danceStyle === 'valse') spin = danceT*2.6;
+    const lift = dancePose(ana, danceT, false, false);
+    ana.g.position.set(c.x, F8.y + lift, c.z); ana.g.rotation.y = (danceStyle === 'tango' ? c.dir : danceStyle === 'rock' ? Math.sin(danceT*.8)*1.2 : 0) + spin;
+    return;
+  }
+  // en couple : Ana et toi face à face autour du centre
+  couple.x = c.x; couple.z = c.z;
+  let face = c.dir;
+  if (danceStyle === 'valse') face = danceT*2.4;
+  else if (danceStyle === 'salsa') face = Math.sin(danceT*.6)*.9;
+  else if (danceStyle === 'rock') face = Math.sin(danceT*.9)*1.3;
+  const off = danceStyle === 'rock' || danceStyle === 'salsa' ? .42 + Math.max(0, Math.sin(danceT*1.2))*.25 : .3;
+  const ox = Math.cos(face)*off, oz = -Math.sin(face)*off; // axe perpendiculaire au déplacement
+  const l1 = dancePose(ana, danceT, false, true), l2 = dancePose(me, danceT, true, true);
+  ana.g.position.set(couple.x + ox, F8.y + l1, couple.z + oz); ana.g.rotation.y = face - Math.PI/2;
+  me.g.position.set(couple.x - ox, F8.y + l2, couple.z - oz); me.g.rotation.y = face + Math.PI/2;
+  pos.x = me.g.position.x; pos.z = me.g.position.z; pos.y = F8.y;
+}
+// caméra cinématique en orbite autour du couple
+const _camFrom = new THREE.Vector3(), _camTo = new THREE.Vector3(), _look = new THREE.Vector3();
+function danceCam(dt){
+  danceBlend = Math.max(0, Math.min(1, danceBlend + (dancing ? dt : -dt)*.8));
+  const e = danceBlend*danceBlend*(3 - 2*danceBlend);
+  camAng += dt*.18;
+  const cx = (ana.g.position.x + me.g.position.x)/2, cz = (ana.g.position.z + me.g.position.z)/2;
+  const R = 3.4 + Math.sin(danceT*.3)*.6, h = F8.y + 1.9 + Math.sin(danceT*.23)*.4;
+  _camTo.set(cx + Math.sin(camAng)*R, h, cz + Math.cos(camAng)*R);
+  _camFrom.set(pos.x, EYE + pos.y, pos.z);
+  cam.position.lerpVectors(_camFrom, _camTo, e);
+  if (e > 0.001){ _look.set(cx, F8.y + 1.1, cz); const q0 = cam.quaternion.clone(); cam.lookAt(_look); const q1 = cam.quaternion.clone(); cam.quaternion.copy(q0).slerp(q1, e); }
+}
+// interface : styles + rejoindre / arrêter
+const dancePanel = document.createElement('div');
+dancePanel.style.cssText = 'position:fixed;left:50%;top:76px;transform:translateX(-50%);display:flex;gap:6px;flex-wrap:wrap;justify-content:center;z-index:6;max-width:94vw';
+dancePanel.hidden = true; document.body.appendChild(dancePanel);
+const btnCss = 'border:1px solid rgba(243,237,226,.25);border-radius:999px;padding:6px 12px;font:600 13px Karla,Arial,sans-serif;cursor:pointer;';
+const styleBtns = {};
+for (const k of Object.keys(DANCES)){ const b = document.createElement('button'); b.textContent = DANCES[k].name; b.style.cssText = btnCss; b.onclick = () => setDance(k); dancePanel.appendChild(b); styleBtns[k] = b; }
+const joinBtn = document.createElement('button'); joinBtn.style.cssText = btnCss + 'background:#c9a54a;color:#1b140c;border-color:#c9a54a'; joinBtn.onclick = () => dancing ? stopDance() : startDance(); dancePanel.appendChild(joinBtn);
+function refreshDanceUI(){ for (const k in styleBtns){ const on = k === danceStyle; styleBtns[k].style.background = on ? '#f3ede2' : 'rgba(21,19,26,.8)'; styleBtns[k].style.color = on ? '#15131a' : '#f3ede2'; } joinBtn.textContent = dancing ? 'Arrêter de danser' : 'Danser avec Ana'; }
+function setDance(k){ danceStyle = k; danceT = 0; refreshDanceUI(); say('Ana', '« ' + DANCES[k].name + ' ! ' + ({tango: 'Regard fier, pas glissés…', salsa: 'Bouge les hanches !', valse: 'Un-deux-trois, on tourne !', rock: 'Allez, on saute !'})[k] + ' »', 2200); }
+function startDance(){ if (dancing) return; dancing = true; sitting = null; try { document.exitPointerLock && document.exitPointerLock(); } catch(e){} me.g.visible = true; camAng = Math.atan2(pos.x - ana.g.position.x, pos.z - ana.g.position.z); danceT = 0; refreshDanceUI(); $('bAct').hidden = true; say('Ana', '« Avec plaisir ! Laisse-toi guider… »', 2500); }
+function stopDance(){ if (!dancing) return; dancing = false; me.g.visible = false; { const ax = ana.g.position.x, az = ana.g.position.z, dx = pos.x - ax, dz = pos.z - az, d = Math.hypot(dx, dz) || 1; pos.x = ax + dx/d*1.3; pos.z = az + dz/d*1.3; } pos.yaw = Math.atan2(-(ana.g.position.x - pos.x), -(ana.g.position.z - pos.z)); pos.pitch = 0; pos.vy = 0; refreshDanceUI(); lastAct = undefined; say('Ana', '« Merci pour cette danse ! Reviens quand tu veux. »', 2500); }
+refreshDanceUI();
+{ const prevAT = actionTarget, prevDA = doAction;
+  actionTarget = function(){ if (mode === 'free' && !sitting && roomAt(pos.x, pos.z, pos.y) === '8b' && Math.hypot(pos.x - ana.g.position.x, pos.z - ana.g.position.z) < 2) return 'Danser avec Ana'; return prevAT(); };
+  doAction = function(){ if (dancing) return stopDance(); if (actionTarget() === 'Danser avec Ana') return startDance(); prevDA(); }; }
+setInterval(() => { const near = dancing || (roomAt(pos.x, pos.z, pos.y) === '8b' && Math.hypot(pos.x - ana.g.position.x, pos.z - ana.g.position.z) < 7); if (dancePanel.hidden === near) dancePanel.hidden = !near; }, 250);
+addEventListener('keydown', e => { if (!dancing) return; if (e.code === 'Escape' || e.code === 'KeyF' || e.code === 'KeyE'){ stopDance(); e.stopImmediatePropagation(); } }, true);
+
 let last = performance.now();
 function tick(now){
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
   resize();
   if (!quizOpen){ if (mode === 'tour') tourStep(dt); else freeStep(dt); }
   bowT = Math.max(0, bowT - dt); updateRoses(dt); updateWarp(dt);
-  updateGuards(dt); updateVisitors(dt); updateBalls(dt); updatePunch(dt); updateNotes(dt); updateKiosk(); updateAudio(); updateSecret(dt); updateBirds(); updateAmbient(); updateTrap(dt);
+  updateGuards(dt); updateVisitors(dt); updateBalls(dt); updatePunch(dt); updateNotes(dt); updateKiosk(); updateAudio(); updateSecret(dt); updateBirds(); updateAmbient(); updateTrap(dt); updateDance(dt);
   if (mode === 'tour' && !drag){ look.idle += dt; if (look.idle > 1.6){ const k = Math.min(1, dt*2.5); look.yaw -= look.yaw*k; look.pitch -= look.pitch*k; } }
   const lt = mode === 'tour';
   cam.position.set(pos.x, EYE + pos.y, pos.z); cam.rotation.set(pos.pitch + (lt ? look.pitch : 0), pos.yaw + (lt ? look.yaw : 0), 0);
   setRoom(roomAt(pos.x, pos.z, pos.y));
+  if (dancing || danceBlend > 0) danceCam(dt);
   renderer.render(scene, cam);
   requestAnimationFrame(tick);
 }
