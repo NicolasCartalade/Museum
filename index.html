@@ -1123,7 +1123,7 @@ const basket = makeBall({r: .12, rest: .72, fric: .8, home: [13.8, 22.25], tex: 
   g.beginPath(); g.ellipse(w/2, h/2, w*.18, h*.5, 0, 0, 7); g.stroke();
 })});
 const ballRay = new THREE.Raycaster();
-let goals = 0, baskets = 0, goalT = 0;
+let goals = 0, baskets = 0, goalT = 0, basketHeld = false, basketDrib = 0;
 const inPitch = (x, z) => x > 14.3 && x < 29.7 && z > 36.8 && z < 45.7;
 function kickBall(b, dirX, dirZ, sp, up){ const n = Math.hypot(dirX, dirZ) || 1; b.vx = dirX/n*sp; b.vz = dirZ/n*sp; b.vy = up; }
 function stepBall(b, dt){
@@ -1150,7 +1150,16 @@ function ballSub(dt){
   stepBall(football, dt);
   if (goalT > 0){ goalT -= dt; if (goalT <= 0) Object.assign(football, {x: 22, y: .11, z: 41.25, vx: 0, vy: 0, vz: 0}); }
   else if (Math.abs(football.z - 41.25) < 1.45 && football.y < 1.55 && (football.x < 14.55 || football.x > 29.45)){ goals++; goalT = 1.6; if (football.by === 'me'){ football.by = null; sportAdd('g'); } if (roomAt(pos.x, pos.z) === 'P') say('BUT !', goals + (goals > 1 ? ' buts marqués' : ' but marqué') + ' au terrain du musée.' + sportTxt('g')); }
-  const py = stepBall(basket, dt);
+  if (basketHeld){
+    const fx = -Math.sin(pos.yaw), fz = -Math.cos(pos.yaw), rx = -fz, rz = fx, mv = keys.fwd || keys.back;
+    basketDrib += dt*(mv ? 5.2 : 0);
+    const y = mv ? .25 + Math.abs(Math.cos(basketDrib))*.75 : 1.25 + Math.sin(performance.now()/400)*.02;
+    Object.assign(basket, {x: pos.x + fx*.45 + rx*(mv ? .22 : 0), y: pos.y + y, z: pos.z + fz*.45 + rz*(mv ? .22 : 0), vx: 0, vy: 0, vz: 0});
+    basket.m.position.set(basket.x, basket.y, basket.z);
+    if (roomAt(pos.x, pos.z, pos.y) !== '8'){ basketHeld = false; Object.assign(basket, {x: basket.home[0], y: basket.r, z: basket.home[1]}); say('Gardien', '« Le ballon reste en salle 8 ! »', 2000); }
+  }
+  const py = basketHeld ? basket.y : stepBall(basket, dt);
+  if (!basketHeld && (basket.x < 9.3 || basket.x > 32 || basket.z < 18.5 || basket.z > 26 || basket.y > 5.0)) Object.assign(basket, {x: basket.home[0], y: basket.r, z: basket.home[1], vx: 0, vy: 0, vz: 0});
   if (py > HOOP.y && basket.y <= HOOP.y && basket.vy < 0){
     const fr = (py - HOOP.y)/(py - basket.y || 1), hd = Math.hypot(basket.px + (basket.x - basket.px)*fr - HOOP.x, basket.pz + (basket.z - basket.pz)*fr - HOOP.z);
     if (hd < .17){ baskets++; sportAdd('b'); say('Panier !', baskets + (baskets > 1 ? ' paniers' : ' panier') + ' en salle 8.' + sportTxt('b')); basket.vx *= .3; basket.vz *= .3; }
@@ -1179,7 +1188,8 @@ function actionTarget(){
   if (mode !== 'free') return null;
   if (sitting) return 'Se lever';
   if (Math.abs(pos.y) > 1) return null;
-  const c = [['Tirer', Math.hypot(football.x - pos.x, football.z - pos.z), 2.2], ['Lancer', Math.hypot(basket.x - pos.x, basket.z - pos.z), 1.8], ['Frapper', Math.hypot(PB.x - pos.x, PB.z - pos.z), 1.8]].filter(a => a[1] < a[2]).sort((a, b) => a[1] - b[1]);
+  if (basketHeld) return 'Tirer au panier';
+  const c = [['Tirer', Math.hypot(football.x - pos.x, football.z - pos.z), 2.2], ['Prendre le ballon', Math.hypot(basket.x - pos.x, basket.z - pos.z), 1.6], ['Frapper', Math.hypot(PB.x - pos.x, PB.z - pos.z), 1.8]].filter(a => a[1] < a[2]).sort((a, b) => a[1] - b[1]);
   if (c.length) return c[0][0];
   return nearSeat() ? 'S’asseoir' : null;
 }
@@ -1190,14 +1200,16 @@ function doAction(){
   else if (a === 'S’asseoir') sitDown(nearSeat());
   else if (a === 'Tirer'){ kickBall(football, fx, fz, 10.5, Math.max(1.5, Math.min(7, 2.5 + pos.pitch*8))); football.by = 'me'; }
   else if (a === 'Frapper'){ hitPunch(PB.x - pos.x, PB.z - pos.z, 3.4); sportAdd('p'); say('Punching-ball', 'Bien frappé !' + sportTxt('p'), 1200); }
-  else if (a === 'Lancer'){
+  else if (a === 'Prendre le ballon'){ basketHeld = true; say('Ballon en main', 'Avance pour dribbler, vise le panier et appuie sur F pour tirer.', 2600); }
+  else if (a === 'Tirer au panier'){
+    basketHeld = false;
     const sx = pos.x + fx*.35, sy = 1.95 + pos.y, sz = pos.z + fz*.35, hx = HOOP.x - sx, hz = HOOP.z - sz, dh = Math.hypot(hx, hz);
     const err = Math.abs(angDiff(Math.atan2(fx, fz), Math.atan2(hx, hz)));
     Object.assign(basket, {x: sx, y: sy, z: sz});
     if (err < .7 && dh < 10){
       const T = .5 + .07*dh, e = .06 + .03*dh + err*.3, tx = HOOP.x + (Math.random() - .5)*2*e, tz = HOOP.z + (Math.random() - .5)*2*e;
       basket.vx = (tx - sx)/T; basket.vz = (tz - sz)/T; basket.vy = (HOOP.y + .02 - sy + .5*9.8*T*T)/T;
-    } else { basket.vx = fx*5; basket.vz = fz*5; basket.vy = 4.5; }
+    } else { const sp = 5.5; basket.vx = fx*sp; basket.vz = fz*sp; basket.vy = 3.2 + Math.max(-.3, pos.pitch)*6; }
   }
   else say('Action', 'Approche-toi du ballon, du panier ou du punching-ball.', 1800);
 }
