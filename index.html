@@ -2238,7 +2238,8 @@ setInterval(() => { const near = dancing || (roomAt(pos.x, pos.z, pos.y) === '8b
 addEventListener('keydown', e => { if (!dancing) return; if (e.code === 'Escape' || e.code === 'KeyF' || e.code === 'KeyE'){ stopDance(); e.stopImmediatePropagation(); } }, true);
 
 /* ---------- Elsa (basket, salle 8), Florence (salle 10), Eric (concert) ---------- */
-const elsa = human({name: 'Elsa', skin: skinA, hair: 0x3a2214, longHair: 0x3a2214, pants: lam(0x5b2a86), legs: skinA, sleeve: lam(0x5b2a86), torso: shirtMats(0x5b2a86, (g, w) => { g.fillStyle = '#f6c700'; g.font = '900 90px Karla, Arial'; g.textAlign = 'center'; g.fillText('23', w/2, 150); }, backName('ELSA', '23', '#f6c700'))});
+const spursFront = (g, w) => { g.strokeStyle = '#c4ced4'; g.lineWidth = 6; g.strokeRect(0, 0, w, 16); g.fillStyle = '#c4ced4'; g.textAlign = 'center'; g.font = 'italic 900 50px Karla, Arial'; g.fillText('SPURS', w/2, 92); g.fillStyle = '#ffffff'; g.font = '900 96px Karla, Arial'; g.fillText('10', w/2, 200); };
+const elsa = human({name: 'Elsa', skin: skinA, hair: 0x3a2214, longHair: 0x3a2214, pants: lam(0x111111), legs: skinA, sleeve: lam(0x111111), torso: shirtMats(0x111111, spursFront, backName('ELSA', '10', '#ffffff'))});
 scene.add(elsa.g);
 const elsaBall = new THREE.Mesh(basket.m.geometry, basket.m.material); scene.add(elsaBall);
 const EL = {A: [17.4, 24.7], B: [13.9, 23.7], C: [14.9, 24.0]};
