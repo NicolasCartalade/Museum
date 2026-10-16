@@ -1474,7 +1474,7 @@ function updateRoses(dt){
     const gy = onStage(p.x, p.z) ? STAGE_Y + .02 : .02;
     if (p.y <= gy && r.vy < 0){
       p.y = gy; r.landed = true; r.g.rotation.set(Math.PI/2, 0, Math.random()*Math.PI*2);
-      if (gy > .1 && !r.told){ r.told = true; say('Une rose sur scène !', 'Les musiciens apprécient.', 1600); bowT = Math.max(bowT, 1.4); }
+      if (gy > .1 && !r.told){ r.told = true; if (!r.npc || roomAt(pos.x, pos.z, pos.y) === 'K') say(r.npc ? 'Eric lance une rose !' : 'Une rose sur scène !', 'Les musiciens apprécient.', 1600); bowT = Math.max(bowT, 1.4); }
     }
   }
 }
@@ -2237,13 +2237,85 @@ refreshDanceUI();
 setInterval(() => { const near = dancing || (roomAt(pos.x, pos.z, pos.y) === '8b' && Math.hypot(pos.x - ana.g.position.x, pos.z - ana.g.position.z) < 7); if (dancePanel.hidden === near) dancePanel.hidden = !near; }, 250);
 addEventListener('keydown', e => { if (!dancing) return; if (e.code === 'Escape' || e.code === 'KeyF' || e.code === 'KeyE'){ stopDance(); e.stopImmediatePropagation(); } }, true);
 
+/* ---------- Elsa (basket, salle 8), Florence (salle 10), Eric (concert) ---------- */
+const elsa = human({name: 'Elsa', skin: skinA, hair: 0x3a2214, longHair: 0x3a2214, pants: lam(0x5b2a86), legs: skinA, sleeve: lam(0x5b2a86), torso: shirtMats(0x5b2a86, (g, w) => { g.fillStyle = '#f6c700'; g.font = '900 90px Karla, Arial'; g.textAlign = 'center'; g.fillText('23', w/2, 150); }, backName('ELSA', '23', '#f6c700'))});
+scene.add(elsa.g);
+const elsaBall = new THREE.Mesh(basket.m.geometry, basket.m.material); scene.add(elsaBall);
+const EL = {A: [17.4, 24.7], B: [13.9, 23.7], C: [14.9, 24.0]};
+let elsaMade = false, elsaCycle = -1;
+function updateElsa(dt){
+  const T = 8.5, t = (performance.now()/1000) % T, cyc = Math.floor(performance.now()/1000/T);
+  if (cyc !== elsaCycle){ elsaCycle = cyc; elsaMade = Math.random() < .72; }
+  const p = elsa, lerp = (a, b, k) => [a[0] + (b[0] - a[0])*k, a[1] + (b[1] - a[1])*k], ease = k => k*k*(3 - 2*k);
+  let x, z, y = 0, face = Math.atan2(HOOP.x - 15, HOOP.z - 23.2), bx, by, bz;
+  p.arms.forEach(a => a.rotation.set(0, 0, 0)); p.legs.forEach(l => { l.thigh.rotation.x = 0; l.shin.rotation.x = 0; });
+  const fx = Math.sin(face), fz = Math.cos(face), rx = fz, rz = -fx; // avant / droite d’Elsa
+  if (t < 2.6){ // dribble vers le panier
+    [x, z] = lerp(EL.A, EL.B, ease(t/2.6)); walkAnim(p, t*9, .8);
+    p.arms[0].rotation.x = -.5 + Math.abs(Math.sin(t*7))*.25;
+    bx = x + fx*.32 - rx*.25; bz = z + fz*.32 - rz*.25; by = .15 + Math.abs(Math.cos(t*7))*.75;
+  } else if (t < 3.15){ // step back
+    const k = ease((t - 2.6)/.55); [x, z] = lerp(EL.B, EL.C, k); y = Math.sin(k*Math.PI)*.18;
+    p.legs[0].thigh.rotation.x = -.5*Math.sin(k*Math.PI); p.legs[1].thigh.rotation.x = .35*Math.sin(k*Math.PI);
+    p.arms.forEach(a => a.rotation.x = -1.1);
+    bx = x + fx*.35; bz = z + fz*.35; by = 1.15 + y;
+  } else if (t < 3.6){ // tir en suspension
+    [x, z] = EL.C; const k = (t - 3.15)/.45; y = Math.sin(Math.min(1, k)*Math.PI)*.42;
+    p.arms.forEach(a => a.rotation.x = -1.2 - k*1.75);
+    p.legs.forEach(l => { l.shin.rotation.x = .3*(1 - k); });
+    bx = x + fx*.15; bz = z + fz*.15; by = 1.9 + y + k*.4;
+  } else { // vol du ballon puis retour
+    [x, z] = EL.C;
+    const k = Math.min(1, (t - 3.6)/1.0), sx = x + fx*.15, sz = z + fz*.15, sy = 2.7;
+    const tx = HOOP.x + (elsaMade ? 0 : .32), tz = HOOP.z + (elsaMade ? 0 : .18);
+    if (k < 1){ bx = sx + (tx - sx)*k; bz = sz + (tz - sz)*k; by = sy + (HOOP.y + .12 - sy)*k + Math.sin(k*Math.PI)*1.6; p.arms.forEach(a => a.rotation.x = -2.9 + k*.6); }
+    else {
+      const k2 = (t - 4.6)/3.9; // le ballon redescend, rebondit et revient vers Elsa qui retourne en A
+      const drop = Math.min(1, k2*4), bounce = Math.abs(Math.sin(k2*Math.PI*5))*(1 - k2)*.9;
+      const ox = elsaMade ? 0 : .9, from = [tx + ox, tz + (elsaMade ? 0 : .6)];
+      const back = ease(Math.min(1, k2*1.1)); [x, z] = lerp(EL.C, EL.A, back); walkAnim(p, t*8, back < 1 ? .6 : 0);
+      [bx, bz] = lerp(from, [x + fx*.4, z + fz*.4], ease(Math.max(0, (k2 - .15)/.85)));
+      by = drop < 1 ? HOOP.y + (.12 - HOOP.y)*drop : .13 + bounce;
+      if (k2 > .8){ p.arms[0].rotation.x = -.5; by = Math.max(by, .15 + Math.abs(Math.cos(t*7))*.75); }
+      if (k2 < .3 && elsaMade) p.arms[1].rotation.x = -2.6; // petit geste de victoire
+    }
+  }
+  p.g.position.set(x, y, z); p.g.rotation.y = face;
+  elsaBall.position.set(bx, by, bz); elsaBall.rotation.x += dt*6;
+}
+// Florence, assise sur le banc face aux Nymphéas (salle 10)
+const florence = human({name: 'Florence', skin: skinD, hair: 0x8a5a2b, longHair: 0x8a5a2b, pants: lam(0x2f4a6a), sleeve: lam(0xe7d6ef), torso: shirtMats(0xe7d6ef)});
+{ const n = hung.find(h => h.key === 'nympheas') || {x: 22, z: 1}; const side = n.z < CZ ? -1 : 1;
+  sitPose(florence, -.42); florence.arms.forEach(a => a.rotation.x = -.45);
+  const fxp = Math.max(CX - 1.3, Math.min(CX + 1.3, n.x)), fzp = CZ + side*.05;
+  place(florence, fxp, -.42, fzp, Math.atan2(n.x - fxp, n.z - fzp), 'still'); florence.head.rotation.x = -.08; }
+// Eric, assis au concert, lance des roses de temps en temps
+const eric = human({name: 'Eric', skin: skinC, hair: 0x15100c, pants: lam(0x2b2b2b), sleeve: lam(0x8a3a2a), torso: shirtMats(0x8a3a2a)});
+sitPose(eric, -.42); const vEric = place(eric, 7.8, -.42, 38.9, 0, 'still');
+let ericNext = 6 + Math.random()*8, ericThrow = 0;
+function ericRose(){
+  const g = makeRose(), sx = 7.8 + .25, sy = 1.55, sz = 38.9 + .2; g.position.set(sx, sy, sz); scene.add(g);
+  const tx = 3 + Math.random()*7, tz = 42.2 + Math.random()*1.6, T = .95;
+  roses.push({g, vx: (tx - sx)/T, vy: (STAGE_Y + .02 - sy + .5*9.8*T*T)/T, vz: (tz - sz)/T, spin: 8 + Math.random()*6, landed: false, npc: true});
+  if (roses.length > 50){ const o = roses.shift(); scene.remove(o.g); }
+}
+function updateFriends2(dt){
+  updateElsa(dt);
+  // Eric : balancement de tête en rythme, applaudit parfois, lance une rose
+  const t = performance.now()/1000; eric.head.rotation.x = Math.sin(t*4.2)*.08; eric.head.rotation.y = Math.sin(t*.4)*.15;
+  ericNext -= dt;
+  if (ericThrow > 0){ ericThrow -= dt; const k = 1 - ericThrow/.6; eric.arms[1].rotation.x = -.5 - Math.sin(k*Math.PI)*2.2; if (ericThrow <= .3 && ericThrow + dt > .3) ericRose(); }
+  else { const clapK = Math.max(0, Math.sin(t*.5)) > .97; eric.arms.forEach((a, i) => { a.rotation.x = clapK ? -1.1 : -.45; a.rotation.z = clapK ? (i ? -1 : 1)*(.3 + Math.abs(Math.sin(t*14))*.25) : 0; }); }
+  if (ericNext <= 0){ ericNext = 12 + Math.random()*16; ericThrow = .6; }
+}
+
 let last = performance.now();
 function tick(now){
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
   resize();
   if (!quizOpen){ if (mode === 'tour') tourStep(dt); else freeStep(dt); }
   bowT = Math.max(0, bowT - dt); updateRoses(dt); updateWarp(dt);
-  updateGuards(dt); updateVisitors(dt); updateBalls(dt); updatePunch(dt); updateNotes(dt); updateKiosk(); updateAudio(); updateSecret(dt); updateBirds(); updateAmbient(); updateTrap(dt); updateDance(dt);
+  updateGuards(dt); updateVisitors(dt); updateBalls(dt); updatePunch(dt); updateNotes(dt); updateKiosk(); updateAudio(); updateSecret(dt); updateBirds(); updateAmbient(); updateTrap(dt); updateDance(dt); updateFriends2(dt);
   if (mode === 'tour' && !drag){ look.idle += dt; if (look.idle > 1.6){ const k = Math.min(1, dt*2.5); look.yaw -= look.yaw*k; look.pitch -= look.pitch*k; } }
   const lt = mode === 'tour';
   cam.position.set(pos.x, EYE + pos.y, pos.z); cam.rotation.set(pos.pitch + (lt ? look.pitch : 0), pos.yaw + (lt ? look.yaw : 0), 0);
